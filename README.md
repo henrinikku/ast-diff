@@ -13,4 +13,4 @@
 
 ### Viikko 2
 
-- [Viikkoraportti 2](docs/viikko1.md)
+- [Viikkoraportti 2](docs/viikko2.md)
