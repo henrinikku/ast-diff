@@ -1,11 +1,21 @@
 [tool.poetry]
-name = "ast-diff"
+name = "astdiff"
 version = "0.1.0"
 description = ""
 authors = ["Henri Nikku <henrinikku1@gmail.com>"]
+# packages = [
+#     {include = "astdiff"}
+# ]
+# include = [
+#     {path = "tests", format = "sdist"}
+# ]
+
+[tool.poetry.scripts]
+astdiff = "astdiff.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+typer = {extras = ["all"], version = "^0.6.1"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
