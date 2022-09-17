@@ -27,6 +27,5 @@ def diff(
     differ.diff()
 
 
-
 if __name__ == "__main__":
     app()
