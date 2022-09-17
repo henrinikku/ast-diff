@@ -11,5 +11,5 @@ class ChangeDistilling:
 
     def diff(self):
         logger.info("Diffing...")
-        logger.info("Source:\n%s", ast.dump(self.source_ast, indent=2))
-        logger.info("Target:\n%s", ast.dump(self.target_ast, indent=2))
+        print("Source:\n", ast.dump(self.source_ast, indent=2))
+        print("Target:\n", ast.dump(self.target_ast, indent=2))
