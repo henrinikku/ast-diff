@@ -1,8 +1,8 @@
-import typer
 import logging
-from pathlib import Path
 
-from astdiff.change_distilling import ChangeDistilling
+import typer
+
+from astdiff.differ import diff as diff_asts
 from astdiff.io import read_ast
 
 logger = logging.getLogger(__name__)
@@ -23,8 +23,10 @@ def diff(
     source_ast = read_ast(source_file)
     target_ast = read_ast(target_file)
 
-    differ = ChangeDistilling(source_ast, target_ast)
-    differ.diff()
+    edit_script = diff_asts(source_ast, target_ast)
+
+    print(f"Edit script ({len(edit_script)} ops):")
+    print(*edit_script, sep="\n")
 
 
 if __name__ == "__main__":
