@@ -1,5 +1,13 @@
 import ast
 
+from astdiff.traversal import post_order_walk
+
+
+def add_metadata(node: ast.AST):
+    AddLabelVisitor().visit(node)
+    LeafVisitor().visit(node)
+    add_height(node)
+
 
 def add_field(node: ast.AST, name: str, value):
     """
@@ -9,6 +17,27 @@ def add_field(node: ast.AST, name: str, value):
     if name not in node._fields:
         node._fields += (name,)
 
+
+def add_height(root: ast.AST):
+    """
+    Calculates height of each node in given tree.
+    """
+    for node in post_order_walk(root):
+        height = 1 + max([x.height for x in ast.iter_child_nodes(node)] or [0])
+        add_field(node, "height", height)
+
+
+class HashVisitor(ast.NodeVisitor):
+    """
+    """
+
+    def generic_visit(self, node: ast.AST):
+        super().generic_visit(node)
+
+    def hash_leaf(self, node: ast.AST): ...
+
+    def hash_node(self, node: ast.AST, size: int, separator: int):
+        return hash(type(node), node.)
 
 class AddLabelVisitor(ast.NodeVisitor):
     """
@@ -21,7 +50,7 @@ class AddLabelVisitor(ast.NodeVisitor):
         super().generic_visit(node)
 
 
-class CheckLeafVisitor(ast.NodeVisitor):
+class LeafVisitor(ast.NodeVisitor):
     """
     Adds is_leaf member to the given node and its descendants.
     """
@@ -30,21 +59,3 @@ class CheckLeafVisitor(ast.NodeVisitor):
         is_leaf = not any(ast.iter_child_nodes(node))
         add_field(node, "is_leaf", is_leaf)
         super().generic_visit(node)
-
-
-class AddLeafValueVisitor(ast.NodeVisitor):
-    """
-    Adds a string value to leaves of the given tree.
-    """
-
-    def generic_visit(self, node: ast.AST):
-        if node.is_leaf:
-            value = ast.unparse(node)
-            add_field(node, "leaf_value", value)
-        super().generic_visit(node)
-
-
-def add_metadata(node: ast.AST):
-    AddLabelVisitor().visit(node)
-    CheckLeafVisitor().visit(node)
-    AddLeafValueVisitor().visit(node)

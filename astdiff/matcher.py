@@ -1,45 +1,56 @@
 import ast
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from functools import cached_property
-from typing import Set
+
+from astdiff.context import DiffContext, MatchingSet
 
 logger = logging.getLogger(__name__)
 
-NodeId = int
-
-
-@dataclass(frozen=True)
-class MatchingPair:
-    source: NodeId
-    target: NodeId
-
-
-@dataclass(frozen=True)
-class MatchResult:
-    matched_ids: Set[MatchingPair]
-
-    @cached_property
-    def matched_source_ids(self):
-        return set(x.source for x in self.matched_ids)
-
-    @cached_property
-    def matched_target_ids(self):
-        return set(x.target for x in self.matched_ids)
-
 
 class Matcher(ABC):
+    """
+    Base class for all node matching implementations
+    """
+
     @abstractmethod
-    def find_matching_nodes(self, source: ast.AST, target: ast.AST) -> MatchResult:
+    def find_matching_nodes(
+        self,
+        source_ast: ast.AST,
+        target_ast: ast.AST,
+        ctx: DiffContext,
+    ) -> MatchingSet:
         ...
 
 
 class StubMatcher(Matcher):
-    def find_matching_nodes(self, source: ast.AST, target: ast.AST):
-        return MatchResult(set())
+    """
+    Dummy matcher that never matches any nodes.
+    """
+
+    def find_matching_nodes(
+        self,
+        source_ast: ast.AST,
+        target_ast: ast.AST,
+        ctx: DiffContext,
+    ):
+        return frozenset()
 
 
 class ChangeDistillingMatcher(Matcher):
-    def find_matching_nodes(self, source: ast.AST, target: ast.AST):
+    """
+    Implementation of the Change Distilling algorithm for node matching.
+
+    Not implemented for now since the algorithm requires a simplified version of AST
+    which is very different from Python's ast.AST.
+
+    Source: Fluri et al. 2007
+    http://serg.aau.at/pub/MartinPinzger/Publications/Fluri2007-changedistiller.pdf
+    """
+
+    def find_matching_nodes(
+        self,
+        source_ast: ast.AST,
+        target_ast: ast.AST,
+        ctx: DiffContext,
+    ):
         raise NotImplementedError()

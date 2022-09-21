@@ -1,6 +1,6 @@
 import ast
 
-from astdiff.io import read_ast
+from astdiff.util import read_ast
 
 
 def test_read_ast():

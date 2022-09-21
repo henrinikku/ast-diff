@@ -3,7 +3,7 @@ import logging
 import typer
 
 from astdiff.differ import diff as diff_asts
-from astdiff.io import read_ast
+from astdiff.util import read_ast
 
 logger = logging.getLogger(__name__)
 
