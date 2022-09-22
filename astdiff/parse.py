@@ -10,15 +10,16 @@ from astdiff.metadata import attach_metadata
 from astdiff.traversal import post_order_walk
 
 
-def parse(file_path: str):
+def parse(file_path: str, add_metadata: bool = True):
     file_text = Path(file_path).read_text()
-    return parse_code(file_text)
+    return parse_code(file_text, add_metadata)
 
 
-def parse_code(code: str):
+def parse_code(code: str, add_metadata: bool = True):
     parso_tree = parso.parse(code)
     canonical_tree = canonicalize(parso_tree)
-    attach_metadata(canonical_tree)
+    if add_metadata:
+        attach_metadata(canonical_tree)
     return canonical_tree
 
 

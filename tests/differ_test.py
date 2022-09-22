@@ -1,11 +1,13 @@
-import parso
 import unittest
+
 from astdiff.differ import diff
+from astdiff.parse import parse_code
 
 
 class DifferTest(unittest.TestCase):
     def test_diff(self):
-        source_ast = parso.parse("print('123')")
-        target_ast = parso.parse("print('321')")
+        source_ast = parse_code("print('123')")
+        target_ast = parse_code("print('321')")
         edit_script = diff(source_ast, target_ast)
-        self.assertIsNotNone(edit_script)
+
+        assert bool(edit_script)
