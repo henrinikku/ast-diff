@@ -44,6 +44,11 @@ class ASTTest(unittest.TestCase):
         without_whitespace = Node.from_code("print('foo'")
         assert with_whitespace == without_whitespace
 
+    def test_parsing_ignores_whitespace(self):
+        with_parens = Node.from_code("a = (((((((1)))))))")
+        without_parens = Node.from_code("a = 1")
+        assert with_parens == without_parens
+
     def test_create_from_parso_ast(self):
         parso_ast = parso.parse("if True == True: print('foo')")
         canonical = Node.from_parso_node(parso_ast)

@@ -3,7 +3,7 @@ import logging
 import typer
 
 from astdiff.differ import diff as diff_asts
-from astdiff.util import read_ast
+from astdiff.parse import parse
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,8 @@ def diff(
 
     logger.info("Comparing %s and %s...", source_file, target_file)
 
-    source_ast = read_ast(source_file)
-    target_ast = read_ast(target_file)
+    source_ast = parse(source_file)
+    target_ast = parse(target_file)
 
     edit_script = diff_asts(source_ast, target_ast)
 

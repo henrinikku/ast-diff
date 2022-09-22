@@ -1,6 +1,6 @@
-import ast
 import logging
 
+from astdiff.ast import Node
 from astdiff.context import DiffContext
 from astdiff.edit_script import (
     EditScript,
@@ -8,16 +8,12 @@ from astdiff.edit_script import (
     WithMoveEditScriptGenerator,
 )
 from astdiff.matcher import Matcher, StubMatcher
-from astdiff.transform import add_metadata
+from astdiff.traversal import pre_order_walk
 
 logger = logging.getLogger(__name__)
 
 
-def diff(source_ast: ast.AST, target_ast: ast.AST):
-    # Add metadata (e.g. label, is_leaf) to nodes.
-    add_metadata(source_ast)
-    add_metadata(target_ast)
-
+def diff(source_ast: Node, target_ast: Node):
     matcher = StubMatcher()
     generator = WithMoveEditScriptGenerator()
     differ = Differ(matcher, generator)
@@ -30,17 +26,17 @@ class Differ:
         self.matcher = matcher
         self.generator = generator
 
-    def diff(self, source_ast: ast.AST, target_ast: ast.AST) -> EditScript:
+    def diff(self, source_ast: Node, target_ast: Node) -> EditScript:
         logger.debug("Diffing...")
 
         ctx = DiffContext(
-            source_nodes={id(x): x for x in ast.walk(source_ast)},
-            target_nodes={id(x): x for x in ast.walk(target_ast)},
+            source_nodes={id(x): x for x in pre_order_walk(source_ast)},
+            target_nodes={id(x): x for x in pre_order_walk(target_ast)},
             matching_set=frozenset(),
         )
 
-        logger.debug("Source:\n%s", ast.dump(source_ast, indent=4))
-        logger.debug("Target:\n%s", ast.dump(target_ast, indent=4))
+        logger.debug("Source:\n%s", source_ast)
+        logger.debug("Target:\n%s", target_ast)
         logger.debug(
             "%s + %s = %s nodes in total",
             len(ctx.source_nodes),

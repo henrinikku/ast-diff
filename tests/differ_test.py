@@ -1,7 +1,6 @@
 import parso
 import unittest
 from astdiff.differ import diff
-from astdiff.util import read_ast
 
 
 class DifferTest(unittest.TestCase):

@@ -1,7 +1,7 @@
-import ast
 import logging
 from abc import ABC, abstractmethod
 
+from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingSet
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,8 @@ class Matcher(ABC):
     @abstractmethod
     def find_matching_nodes(
         self,
-        source_ast: ast.AST,
-        target_ast: ast.AST,
+        source_ast: Node,
+        target_ast: Node,
         ctx: DiffContext,
     ) -> MatchingSet:
         ...
@@ -29,8 +29,8 @@ class StubMatcher(Matcher):
 
     def find_matching_nodes(
         self,
-        source_ast: ast.AST,
-        target_ast: ast.AST,
+        source_ast: Node,
+        target_ast: Node,
         ctx: DiffContext,
     ):
         return frozenset()
@@ -41,7 +41,7 @@ class ChangeDistillingMatcher(Matcher):
     Implementation of the Change Distilling algorithm for node matching.
 
     Not implemented for now since the algorithm requires a simplified version of AST
-    which is very different from Python's ast.AST.
+    which is very different from what easily available parsers can offer.
 
     Source: Fluri et al. 2007
     http://serg.aau.at/pub/MartinPinzger/Publications/Fluri2007-changedistiller.pdf
@@ -49,8 +49,8 @@ class ChangeDistillingMatcher(Matcher):
 
     def find_matching_nodes(
         self,
-        source_ast: ast.AST,
-        target_ast: ast.AST,
+        source_ast: Node,
+        target_ast: Node,
         ctx: DiffContext,
     ):
         raise NotImplementedError()

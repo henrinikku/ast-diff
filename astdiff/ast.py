@@ -1,70 +1,31 @@
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Tuple
-
-import parso
-from parso.python.tree import EndMarker, Newline, Operator
-from parso.tree import NodeOrLeaf
-
-_REDUNDANT_PARSO_NODES = (
-    Newline,
-    EndMarker,
-)
-_REDUNDANT_PARSO_OPERATORS = (
-    ".",
-    ":",
-    ";",
-    "(",
-    ")",
-    "[",
-    "]",
-    "",
-)
-
-
-def _redundant(node: NodeOrLeaf):
-    if isinstance(node, _REDUNDANT_PARSO_NODES):
-        return True
-
-    if isinstance(node, Operator) and node.value in _REDUNDANT_PARSO_OPERATORS:
-        return True
-
-    return False
-
-
-def parse(file_path: str):
-    file_text = Path(file_path).read_text()
-    return Node.from_code(file_text)
+from dataclasses import dataclass, replace
+from typing import Optional, Tuple
 
 
 @dataclass(frozen=True)
+class NodeMetadata:
+    hashcode: int
+    height: int
+    size: int
+
+
+@dataclass
 class Node:
     label: str
     value: str
     children: Tuple["Node", ...]
+    metadata: Optional[NodeMetadata] = None
 
     @property
     def is_leaf(self):
         return not self.children
 
-    @classmethod
-    def from_code(cls, code: str):
-        parso_node = parso.parse(code)
-        return cls.from_parso_node(parso_node)
+    def standalone(self):
+        return replace(self, children=(), metadata=None)
 
-    @classmethod
-    def from_parso_node(cls, node: NodeOrLeaf):
-        value = getattr(node, "value", "")
-        children = getattr(node, "children", [])
-        return cls(
-            label=node.type,
-            value=value,
-            children=tuple(
-                cls.from_parso_node(x) for x in children if not _redundant(x)
-            ),
+    def isomorphic_to(self, other: "Node"):
+        return (
+            self.metadata
+            and other.metadata
+            and self.metadata.hashcode == other.metadata.hashcode
         )
-
-
-@dataclass(frozen=True)
-class NodeMetadata:
-    hash: int

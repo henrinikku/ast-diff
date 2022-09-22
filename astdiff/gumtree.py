@@ -1,5 +1,4 @@
-import ast
-
+from astdiff.ast import Node
 from astdiff.context import DiffContext
 from astdiff.matcher import Matcher
 
@@ -14,10 +13,8 @@ class GumTreeMatcher(Matcher):
 
     def find_matching_nodes(
         self,
-        source_ast: ast.AST,
-        target_ast: ast.AST,
+        source_ast: Node,
+        target_ast: Node,
         ctx: DiffContext,
     ):
         raise NotImplementedError()
-
-    

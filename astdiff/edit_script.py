@@ -1,14 +1,14 @@
-import ast
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Tuple
 
+from astdiff.ast import Node
 from astdiff.context import DiffContext
 
 
 @dataclass(frozen=True)
 class Operation:
-    node: ast.AST
+    node: Node
 
 
 @dataclass(frozen=True)
@@ -56,10 +56,10 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         ops = []
 
         inserted_ids = ctx.unmatched_target_ids
-        ops += [Insert(ctx.target_nodes[x]) for x in inserted_ids]
+        ops += [Insert(ctx.target_nodes[x].standalone()) for x in inserted_ids]
 
         deleted_ids = ctx.unmatched_source_ids
-        ops += [Delete(ctx.source_nodes[x]) for x in deleted_ids]
+        ops += [Delete(ctx.source_nodes[x].standalone()) for x in deleted_ids]
 
         # TODO: Generate moves and updates
         return tuple(ops)

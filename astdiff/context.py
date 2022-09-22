@@ -1,7 +1,8 @@
-import ast
 from dataclasses import dataclass, replace
 from functools import cached_property
-from typing import Dict, FrozenSet, Optional
+from typing import Dict, FrozenSet
+
+from astdiff.ast import Node
 
 NodeId = int
 
@@ -22,10 +23,9 @@ class DiffContext:
     between different stages of the algorithm.
     """
 
-    # During computation nodes are stored, moved around, and accessed by their ids
-    # because Python ASTs are not hashable by default.
-    source_nodes: Dict[NodeId, ast.AST]
-    target_nodes: Dict[NodeId, ast.AST]
+    # Access nodes by their ids in order to avoid recursive hash computations.
+    source_nodes: Dict[NodeId, Node]
+    target_nodes: Dict[NodeId, Node]
     matching_set: MatchingSet
 
     def copy(self, **changes):
