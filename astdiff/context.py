@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import Dict, FrozenSet
 
 from astdiff.ast import Node
+from astdiff.edit_script import EditScript
 
 NodeId = int
 
@@ -16,17 +17,20 @@ class MatchingPair:
 MatchingSet = FrozenSet[MatchingPair]
 
 
-@dataclass(frozen=True)
+@dataclass
 class DiffContext:
     """
     Helper class for holding data that need to be passed along
     between different stages of the algorithm.
     """
 
-    # Access nodes by their ids in order to avoid recursive hash computations.
+    # In data structures that require hashing, nodes are stored and acccessed
+    # by their ids in order to avoid recursive hash computations.
     source_nodes: Dict[NodeId, Node]
     target_nodes: Dict[NodeId, Node]
+
     matching_set: MatchingSet
+    edit_script: EditScript
 
     def copy(self, **changes):
         return replace(self, **changes)

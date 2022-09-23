@@ -27,9 +27,9 @@ class MetadataTest(unittest.TestCase):
         assert tree.metadata.height == 1
 
     def test_hash_calculation_small_isomorphic_trees(self):
-        foo_and_bar = parse_code("print('foo');print('bar')")
-        bar_and_foo = parse_code("print('bar');print('foo')")
-        assert foo_and_bar.isomorphic_to(bar_and_foo)
+        isomorphic1 = parse_code("print('foo');print('bar')")
+        isomorphic2 = parse_code("print('foo'   )   ;       print('bar')")
+        assert isomorphic1.isomorphic_to(isomorphic2)
 
     def test_hash_calculation_small_non_isomorphic_trees(self):
         foo_and_bar = parse_code("print('foo');print('bar')")

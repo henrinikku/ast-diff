@@ -15,8 +15,8 @@ class Matcher(ABC):
     @abstractmethod
     def find_matching_nodes(
         self,
-        source_ast: Node,
-        target_ast: Node,
+        source_root: Node,
+        target_root: Node,
         ctx: DiffContext,
     ) -> MatchingSet:
         ...
@@ -29,8 +29,8 @@ class StubMatcher(Matcher):
 
     def find_matching_nodes(
         self,
-        source_ast: Node,
-        target_ast: Node,
+        source_root: Node,
+        target_root: Node,
         ctx: DiffContext,
     ):
         return frozenset()
@@ -49,8 +49,8 @@ class ChangeDistillingMatcher(Matcher):
 
     def find_matching_nodes(
         self,
-        source_ast: Node,
-        target_ast: Node,
+        source_root: Node,
+        target_root: Node,
         ctx: DiffContext,
     ):
         raise NotImplementedError()

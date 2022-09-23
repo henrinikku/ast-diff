@@ -42,10 +42,7 @@ def _calculate_hash(node: Node):
     current_size = 0
     exponent = lambda: 2 * current_size + 1
 
-    for child in sorted(
-        node.children,
-        key=lambda x: (x.label, x.value, sum(c.metadata.hashcode for c in x.children)),
-    ):
+    for child in node.children:
         current_hash += child.metadata.hashcode * _factor(exponent())
         current_size += child.metadata.size
 

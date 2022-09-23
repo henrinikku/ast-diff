@@ -2,9 +2,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-logger = None
 def main():
     logger.info("same")
+logger = None
 
 
 if __name__ == (( 
