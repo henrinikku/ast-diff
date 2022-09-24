@@ -39,7 +39,7 @@ poetry install
 ### Suoritus
 
 ```
-poetry run <source> <target>
+poetry run astdiff <source> <target>
 ```
 
 Missä `source` ja `target` ovat joko polkuja Python-tiedostoihin tai Python-koodinpätkiä.
