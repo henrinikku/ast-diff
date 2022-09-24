@@ -54,7 +54,7 @@ class GumTreeMatcher(Matcher):
         ctx: DiffContext,
     ):
         """
-        Performs a greedy top-down search of the greatest isomorphic subtrees
+        Performs greedy top-down search of the greatest isomorphic subtrees
         between source and target.
         """
         matching_set = MatchingSet()
