@@ -8,7 +8,6 @@ from parso.tree import NodeOrLeaf as ParsoNode
 
 from astdiff.ast import Node
 from astdiff.metadata import attach_metadata
-from astdiff.traversal import post_order_walk
 
 
 @dataclass(frozen=True)

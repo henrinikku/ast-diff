@@ -2,9 +2,9 @@ import heapq
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from functools import cache, partial
+from functools import partial
 from itertools import product
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
@@ -157,9 +157,7 @@ def _descendant_matches(source_id: NodeId, target_id: NodeId, ctx: DiffContext):
         yield from _descendant_matches(id(source_child), id(target_child), ctx)
 
 
-def _dice_coefficient(
-    match: MatchingPair, ctx: DiffContext, matching_set: MatchingSet
-):
+def _dice_coefficient(match: MatchingPair, ctx: DiffContext, matching_set: MatchingSet):
     """
     Measures the ratio of common descendants between two nodes.
     """

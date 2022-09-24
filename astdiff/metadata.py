@@ -40,7 +40,9 @@ def _calculate_hash(node: Node):
 
     current_hash = 0
     current_size = 0
-    exponent = lambda: 2 * current_size + 1
+
+    def exponent():
+        return 2 * current_size + 1
 
     for child in node.children:
         current_hash += child.metadata.hashcode * _factor(exponent())

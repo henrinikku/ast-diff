@@ -44,7 +44,7 @@ class ASTTest(unittest.TestCase):
         without_whitespace = parse_code("print('foo'")
         assert with_whitespace == without_whitespace
 
-    def test_parsing_ignores_whitespace(self):
+    def test_parsing_ignores_parens(self):
         with_parens = parse_code("a = (((((((1)))))))")
         without_parens = parse_code("a = 1")
         assert with_parens == without_parens

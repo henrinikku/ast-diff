@@ -1,6 +1,4 @@
-import ast
 import unittest
-
 
 from astdiff.ast import Node
 from astdiff.parse import parse, parse_code

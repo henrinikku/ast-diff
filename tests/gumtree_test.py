@@ -1,4 +1,3 @@
-import logging
 import unittest
 
 from astdiff.ast import Node

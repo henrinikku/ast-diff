@@ -27,7 +27,11 @@ class TraversalTest(unittest.TestCase):
                 Node(
                     label="2b_label",
                     value="2b_value",
-                    children=(Node(label="2b_child_label", value="2b_child_value", children=()),),
+                    children=(
+                        Node(
+                            label="2b_child_label", value="2b_child_value", children=()
+                        ),
+                    ),
                 ),
             ),
         )

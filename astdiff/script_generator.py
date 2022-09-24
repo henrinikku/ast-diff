@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from astdiff.context import DiffContext
-from astdiff.edit_script import Delete, EditScript, Insert, Move, Update
+from astdiff.edit_script import Delete, EditScript, Insert
 
 
 class EditScriptGenerator(ABC):
