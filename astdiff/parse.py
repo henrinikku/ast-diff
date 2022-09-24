@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import parso
 from parso.python.tree import EndMarker, Newline, Operator
@@ -10,26 +11,43 @@ from astdiff.metadata import attach_metadata
 from astdiff.traversal import post_order_walk
 
 
-def parse(file_path: str, add_metadata: bool = True):
+@dataclass(frozen=True)
+class ParseOptions:
+    add_metadata: bool = True
+    add_parent: bool = False
+
+
+def parse(file_path: str, options: ParseOptions = ParseOptions()):
     file_text = Path(file_path).read_text()
-    return parse_code(file_text, add_metadata)
+    return parse_code(file_text, options)
 
 
-def parse_code(code: str, add_metadata: bool = True):
+def parse_code(code: str, options: ParseOptions = ParseOptions()):
     parso_tree = parso.parse(code)
     canonical_tree = canonicalize(parso_tree)
-    if add_metadata:
+    if options.add_metadata:
         attach_metadata(canonical_tree)
     return canonical_tree
 
 
-def canonicalize(node: ParsoNode):
+def canonicalize(
+    node: ParsoNode,
+    options: ParseOptions = ParseOptions(),
+    parent: Optional[Node] = None,
+):
     label = node.type
     value = getattr(node, "value", "")
-    children = tuple(
-        canonicalize(x) for x in _iter_child_nodes(node) if not _redundant(x)
+
+    canonical_node = Node(label, value, parent=parent, children=())
+    parent_node = canonical_node if options.add_parent else None
+
+    canonical_node.children = tuple(
+        canonicalize(x, options, parent_node)
+        for x in _iter_child_nodes(node)
+        if not _redundant(x)
     )
-    return Node(label, value, children)
+
+    return canonical_node
 
 
 _REDUNDANT_PARSO_NODES = (

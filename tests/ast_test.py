@@ -4,12 +4,12 @@ import parso
 import parso.python.tree
 import parso.tree
 from astdiff.ast import Node
-from astdiff.parse import canonicalize, parse, parse_code
+from astdiff.parse import ParseOptions, canonicalize, parse, parse_code
 
 
 class ASTTest(unittest.TestCase):
     def test_parse(self):
-        ast = parse("tests/data/print_123.py", add_metadata=False)
+        ast = parse("tests/data/print_123.py", ParseOptions(add_metadata=False))
         assert ast == Node(
             label="file_input",
             value="",

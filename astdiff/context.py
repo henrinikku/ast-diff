@@ -1,6 +1,5 @@
 from dataclasses import dataclass, replace
-from functools import cached_property
-from typing import Dict, FrozenSet
+from typing import Dict, Iterable
 
 from astdiff.ast import Node
 from astdiff.edit_script import EditScript
@@ -14,7 +13,34 @@ class MatchingPair:
     target: NodeId
 
 
-MatchingSet = FrozenSet[MatchingPair]
+@dataclass
+class MatchingSet:
+    source_target_map: Dict[NodeId, NodeId]
+    target_source_map: Dict[NodeId, NodeId]
+
+    def __init__(self):
+        self.source_target_map = {}
+        self.target_source_map = {}
+
+    def add(self, pair: MatchingPair):
+        assert self.unmatched(pair)
+
+        self.source_target_map[pair.source] = pair.target
+        self.target_source_map[pair.target] = pair.source
+
+    def update(self, pairs: Iterable[MatchingPair]):
+        for pair in pairs:
+            self.add(pair)
+
+    def unmatched(self, pair: MatchingPair):
+        return (
+            pair.source not in self.source_target_map
+            and pair.target not in self.target_source_map
+        )
+
+    @property
+    def pairs(self):
+        return (MatchingPair(s, t) for s, t in self.source_target_map.items())
 
 
 @dataclass
@@ -35,18 +61,18 @@ class DiffContext:
     def copy(self, **changes):
         return replace(self, **changes)
 
-    @cached_property
+    @property
     def matched_source_ids(self):
-        return set(x.source for x in self.matching_set)
+        return set(self.matching_set.source_target_map)
 
-    @cached_property
+    @property
     def matched_target_ids(self):
-        return set(x.target for x in self.matching_set)
+        return set(self.matching_set.target_source_map)
 
-    @cached_property
+    @property
     def unmatched_source_ids(self):
         return set(self.source_nodes) - self.matched_source_ids
 
-    @cached_property
+    @property
     def unmatched_target_ids(self):
         return set(self.target_nodes) - self.matched_target_ids

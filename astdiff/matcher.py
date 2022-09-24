@@ -33,7 +33,7 @@ class StubMatcher(Matcher):
         target_root: Node,
         ctx: DiffContext,
     ):
-        return frozenset()
+        return MatchingSet()
 
 
 class ChangeDistillingMatcher(Matcher):
