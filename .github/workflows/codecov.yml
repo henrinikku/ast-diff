@@ -39,7 +39,9 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Generate report
-        run: poetry run coverage run
+        run: |
+          poetry run coverage run
+          poetry run coverage xml
 
       - name: Upload report to codecov
         uses: codecov/codecov-action@v2
