@@ -50,6 +50,18 @@ Missä `source` ja `target` ovat joko polkuja Python-tiedostoihin tai Python-koo
 poetry run pytest
 ```
 
+### Testikattavuuden mittaus
+
+```
+coverage run
+```
+
+### Testikattavuuden raportointi
+
+```
+coverage report
+```
+
 ### Formatointi
 
 ```

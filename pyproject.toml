@@ -16,11 +16,20 @@ parso = "^0.8.3"
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
 ipykernel = "^6.15.3"
-coverage = "^6.4.4"
+coverage = { extras = ["toml"], version = "^6.4.4" }
 flake8 = "^5.0.4"
 
 [tool.black]
 extend-exclude = "tests/data"
+
+[tool.coverage.run]
+branch = true
+command_line = "-m pytest"
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+omit = ["tests/*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
