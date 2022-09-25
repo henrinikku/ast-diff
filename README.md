@@ -1,5 +1,7 @@
 # ast-diff
 
+[![codecov](https://codecov.io/gh/henrinikku/ast-diff/branch/main/graph/badge.svg?token=GAZWCV7WL8)](https://codecov.io/gh/henrinikku/ast-diff)
+
 ## Dokumentaatio
 
 - [Määrittelydokumentti](docs/maarittelydokumentti.md)

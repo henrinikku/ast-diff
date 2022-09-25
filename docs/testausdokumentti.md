@@ -1,5 +1,7 @@
 # Testausdokumentti
 
+[![codecov](https://codecov.io/gh/henrinikku/ast-diff/branch/main/graph/badge.svg?token=GAZWCV7WL8)](https://codecov.io/gh/henrinikku/ast-diff)
+
 ### Miten testataan
 
 Projektin testaus perustuu ainakin toistaiseksi kattaviin yksikkötesteihin. Suorituskykyä mittaavia testejä en ole toteuttanut vielä, mutta haluaisin lisätä ne jossain vaiheessa. Saatan myös lisätä myöhemmin integraatiotestejä käyttöliittymän testaamiseksi. Mikäli pisteiden saamiseen vaaditaan tietyn tyyppisten testien lisäämistä, lisään tarvittavat testit.
