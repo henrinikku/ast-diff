@@ -1,0 +1,48 @@
+name: codecov
+on: [push]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      OS: ubuntu-latest
+      PYTHON: '3.10.6'
+    steps:
+      - name: Checkout repo
+        uses: checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Setup Python
+        id: setup-python
+        uses: actions/setup-python@master
+        with:
+          python-version: 3.10.6
+      
+      - name: Install Poetry
+          uses: snok/install-poetry@v1
+          with:
+            virtualenvs-in-project: true
+            installation-arguments: --git https://github.com/python-poetry/poetry.git@68649946fe09d52ed1a5844bda6690ba6327c408
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install library
+        run: poetry install --no-interaction
+
+      - name: Activate virtual env
+        run: poetry shell
+
+      - name: Generate Report
+        run: coverage run
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
