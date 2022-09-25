@@ -38,8 +38,8 @@ jobs:
       - name: Install library
         run: poetry install --no-interaction
 
-      - name: Generate Report
+      - name: Generate report
         run: poetry run coverage run
 
-      - name: Upload Coverage to Codecov
+      - name: Upload report to codecov
         uses: codecov/codecov-action@v2
