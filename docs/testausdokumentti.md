@@ -34,14 +34,15 @@ Name                          Stmts   Miss  Cover
 astdiff/__init__.py               0      0   100%
 astdiff/ast.py                   26      0   100%
 astdiff/context.py               48      1    98%
-astdiff/differ.py                30      0   100%
+astdiff/differ.py                29      0   100%
 astdiff/edit_script.py           19      0   100%
-astdiff/gumtree.py              130      2    98%
+astdiff/gumtree.py              114      2    98%
 astdiff/matcher.py               15      3    80%
-astdiff/metadata.py              30      0   100%
-astdiff/parse.py                 43      0   100%
+astdiff/metadata.py              31      0   100%
+astdiff/parse.py                 42      0   100%
+astdiff/queue.py                 19      0   100%
 astdiff/script_generator.py      15      1    93%
 astdiff/traversal.py              9      0   100%
 -------------------------------------------------
-TOTAL                           365      7    98%
+TOTAL                           367      7    98%
 ```

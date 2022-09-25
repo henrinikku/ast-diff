@@ -1,14 +1,14 @@
-import heapq
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import product
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
 from astdiff.matcher import Matcher
+from astdiff.queue import HeightIndexedPriorityQueue
 from astdiff.traversal import pre_order_walk
 
 logger = logging.getLogger(__name__)
@@ -60,10 +60,10 @@ class GumTreeMatcher(Matcher):
         matching_set = MatchingSet()
         candidate_mappings: List[Mapping] = []
 
-        source_queue = HeightIndexedPriorityList()
+        source_queue = HeightIndexedPriorityQueue()
         source_queue.push(source_root)
 
-        target_queue = HeightIndexedPriorityList()
+        target_queue = HeightIndexedPriorityQueue()
         target_queue.push(target_root)
 
         while min(source_queue.peek_max(), target_queue.peek_max()) >= self.min_height:
@@ -243,41 +243,3 @@ class MappingStore:
 
     def unmatched_mappings(self):
         return (x for x in self.mappings.values() if x.unmatched)
-
-
-class HeightIndexedPriorityList:
-    """
-    Priority queue that keeps nodes in descending order based on height.
-    """
-
-    def __init__(self):
-        self.heap: List[Tuple[int, Node]] = []
-
-    def open(self, node: Node):
-        """
-        Adds children of given node to the heap.
-        """
-        for child in node.children:
-            self.push(child)
-
-    def push(self, node: Node):
-        """
-        Adds given node to the heap.
-        """
-        heapq.heappush(self.heap, (-node.metadata.height, node))
-
-    def pop(self):
-        """
-        Pops all nodes that share the current max height.
-        """
-        max_height = self.peek_max()
-        while self.peek_max() == max_height:
-            _, node = heapq.heappop(self.heap)
-            yield node
-
-    def peek_max(self):
-        """
-        Returns height of the tallest node, or 0 if the heap is empty.
-        """
-        height, _ = (self.heap and self.heap[0]) or (0, None)
-        return -height
