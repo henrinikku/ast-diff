@@ -17,13 +17,13 @@ poetry run pytest
 Testien kattavuuden saa mitattua ajamalla projektin juurikansiossa:
 
 ```
-coverage run
+poetry run coverage run
 ```
 
 Vastaavasti kattavuusraportin saa tulostettua ajamalla:
 
 ```
-coverage report
+poetry run coverage report
 ```
 
 Yksikkötestien kattavuus on raportin perusteella tällä hetkellä melko hyvällä tolalla:

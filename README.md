@@ -53,13 +53,13 @@ poetry run pytest
 ### Testikattavuuden mittaus
 
 ```
-coverage run
+poetry run coverage run
 ```
 
 ### Testikattavuuden raportointi
 
 ```
-coverage report
+poetry run coverage report
 ```
 
 ### Formatointi
