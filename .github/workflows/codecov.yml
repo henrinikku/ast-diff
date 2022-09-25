@@ -19,10 +19,10 @@ jobs:
           python-version: 3.10.6
       
       - name: Install Poetry
-          uses: snok/install-poetry@v1
-          with:
-            virtualenvs-in-project: true
-            installation-arguments: --git https://github.com/python-poetry/poetry.git@68649946fe09d52ed1a5844bda6690ba6327c408
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-in-project: true
+          installation-arguments: --git https://github.com/python-poetry/poetry.git@68649946fe09d52ed1a5844bda6690ba6327c408
 
       - name: Load cached venv
         id: cached-poetry-dependencies
