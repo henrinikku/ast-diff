@@ -23,7 +23,7 @@ coverage run
 Vastaavasti kattavuusraportin saa tulostettua ajamalla:
 
 ```
-coverage report"
+coverage report
 ```
 
 Yksikkötestien kattavuus on raportin perusteella tällä hetkellä melko hyvällä tolalla:
