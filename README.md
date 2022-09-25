@@ -50,13 +50,13 @@ Missä `source` ja `target` ovat joko polkuja Python-tiedostoihin tai Python-koo
 poetry run pytest
 ```
 
-### Koodin formatointi
+### Formatointi
 
 ```
 poetry run black astdiff
 ```
 
-### Koodin linttaus
+### Linttaus
 
 ```
 poetry run flake8
