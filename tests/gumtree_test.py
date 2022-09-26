@@ -1,5 +1,5 @@
-from typing import List, Tuple
 import unittest
+from typing import List, Tuple
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingSet

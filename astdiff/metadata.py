@@ -1,7 +1,6 @@
 from astdiff.ast import Node, NodeMetadata
 from astdiff.traversal import post_order_walk
 
-
 _HASH_START = "start"
 _HASH_END = "end"
 _HASH_BASE = 33
