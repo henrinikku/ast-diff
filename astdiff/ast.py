@@ -20,7 +20,7 @@ class NodeMetadata:
 class Node:
     label: str
     value: str
-    children: Tuple["Node", ...] = field(default=tuple, repr=False)
+    children: Tuple["Node", ...] = field(default_factory=tuple, repr=False)
     parent: Optional["Node"] = field(default=None, repr=False, compare=False)
     metadata: Optional[NodeMetadata] = field(default=None, repr=False)
 
