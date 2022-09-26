@@ -67,7 +67,7 @@ poetry run coverage report
 ### Formatointi
 
 ```
-poetry run black astdiff
+poetry run black .
 ```
 
 ### Linttaus
