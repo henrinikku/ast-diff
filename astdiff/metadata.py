@@ -9,7 +9,7 @@ _HASH_BASE = 33
 
 def attach_metadata(tree: Node):
     """
-    Walks the given tree via bottom-up recursion and attaches metadata
+    Walks given tree via bottom-up recursion and attaches metadata
     to each node based on child results.
     """
     for node in post_order_walk(tree):

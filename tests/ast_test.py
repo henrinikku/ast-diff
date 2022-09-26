@@ -4,12 +4,16 @@ import parso
 import parso.python.tree
 import parso.tree
 from astdiff.ast import Node
-from astdiff.parse import ParseOptions, canonicalize, parse, parse_code
+from astdiff.parse import ParseOptions, ParsoParser
 
 
 class ASTTest(unittest.TestCase):
+    def setUp(self):
+        self.parser = ParsoParser(ParseOptions(add_metadata=False))
+
     def test_parse(self):
-        ast = parse("tests/data/print_123.py", ParseOptions(add_metadata=False))
+        ast = self.parser.parse_file("tests/data/print_123.py")
+
         assert ast == Node(
             label="file_input",
             value="",
@@ -40,18 +44,18 @@ class ASTTest(unittest.TestCase):
         )
 
     def test_parsing_ignores_whitespace(self):
-        with_whitespace = parse_code("print(        'foo'")
-        without_whitespace = parse_code("print('foo'")
+        with_whitespace = self.parser.parse_code("print(        'foo'")
+        without_whitespace = self.parser.parse_code("print('foo'")
         assert with_whitespace == without_whitespace
 
     def test_parsing_ignores_parens(self):
-        with_parens = parse_code("a = (((((((1)))))))")
-        without_parens = parse_code("a = 1")
+        with_parens = self.parser.parse_code("a = (((((((1)))))))")
+        without_parens = self.parser.parse_code("a = 1")
         assert with_parens == without_parens
 
     def test_create_from_parso_ast(self):
         parso_ast = parso.parse("if True == True: print('foo')")
-        canonical = canonicalize(parso_ast)
+        canonical = self.parser.canonicalize(parso_ast)
         assert canonical == Node(
             label="file_input",
             value="",
