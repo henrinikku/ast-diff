@@ -1,7 +1,7 @@
 import unittest
 
 from astdiff.differ import diff
-from astdiff.parse import ParsoParser
+from astdiff.parser import ParsoParser
 
 
 class DifferTest(unittest.TestCase):

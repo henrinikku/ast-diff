@@ -2,7 +2,7 @@ import unittest
 
 from astdiff.ast import Node
 from astdiff.metadata import attach_metadata
-from astdiff.parse import ParsoParser
+from astdiff.parser import ParsoParser
 
 
 class MetadataTest(unittest.TestCase):
