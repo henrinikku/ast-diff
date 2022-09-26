@@ -70,6 +70,12 @@ poetry run coverage report
 poetry run black .
 ```
 
+### Importien sorttaus
+
+```
+poetry run isort .
+```
+
 ### Linttaus
 
 ```
