@@ -7,6 +7,12 @@ _HASH_END = "end"
 _HASH_BASE = 33
 
 
+def add_parents(tree: Node):
+    for node in post_order_walk(tree):
+        for child in node.children:
+            child.parent = node
+
+
 def attach_metadata(tree: Node):
     """
     Walks given tree via bottom-up recursion and attaches metadata

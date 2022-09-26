@@ -9,7 +9,7 @@ from parso.python.tree import EndMarker, Newline, Operator
 from parso.tree import NodeOrLeaf as ParsoNode
 
 from astdiff.ast import Node
-from astdiff.metadata import attach_metadata
+from astdiff.metadata import add_parents, attach_metadata
 
 
 @dataclass(frozen=True)
@@ -48,8 +48,13 @@ class Parser(ABC, Generic[T]):
     def parse_code(self, code: str) -> Node:
         tree = self.parse_with_lib(code)
         canonical_tree = self.canonicalize(tree)
+
         if self.options.add_metadata:
             attach_metadata(canonical_tree)
+
+        if self.options.add_parent:
+            add_parents(canonical_tree)
+
         return canonical_tree
 
     @abstractmethod
@@ -96,20 +101,15 @@ class ParsoParser(Parser[ParsoNode]):
     def parse_with_lib(self, code: str) -> ParsoNode:
         return parso.parse(code)
 
-    def canonicalize(self, node: ParsoNode, parent: Optional[Node] = None):
+    def canonicalize(self, node: ParsoNode):
         label = node.type
         value = getattr(node, "value", "")
-
-        canonical_node = Node(label, value, parent=parent, children=())
-        parent_node = canonical_node if self.options.add_parent else None
-
-        canonical_node.children = tuple(
-            self.canonicalize(x, parent_node)
+        children = tuple(
+            self.canonicalize(x)
             for x in self._iter_child_nodes(node)
             if not self._redundant(x)
         )
-
-        return canonical_node
+        return Node(label, value, children=children)
 
     @classmethod
     def _iter_child_nodes(cls, node: ParsoNode):

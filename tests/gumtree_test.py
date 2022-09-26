@@ -1,16 +1,13 @@
+from typing import List, Tuple
 import unittest
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingSet
 from astdiff.gumtree import GumTreeMatcher
-from astdiff.metadata import attach_metadata
-from astdiff.traversal import post_order_walk, pre_order_walk
+from astdiff.metadata import add_parents, attach_metadata
+from astdiff.traversal import pre_order_walk
 
-
-def _add_parents(tree: Node):
-    for node in post_order_walk(tree):
-        for child in node.children:
-            child.parent = node
+Pair = Tuple[str, str]
 
 
 class GumTreeMatcherTest(unittest.TestCase):
@@ -195,52 +192,78 @@ class GumTreeMatcherTest(unittest.TestCase):
             ),
         )
 
-        _add_parents(self.source)
-        _add_parents(self.target)
+        add_parents(self.source)
+        add_parents(self.target)
 
         attach_metadata(self.source)
         attach_metadata(self.target)
 
-        self.context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(self.source)},
-            target_nodes={id(x): x for x in pre_order_walk(self.target)},
+        self.matcher = GumTreeMatcher(min_height=1)
+
+    def assert_matched_anchors(
+        self,
+        source: Node,
+        target: Node,
+        expected: List[Tuple[Pair, Pair]],
+    ):
+        expected = sorted(expected)
+
+        context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(source)},
+            target_nodes={id(x): x for x in pre_order_walk(target)},
             matching_set=MatchingSet(),
             edit_script=(),
         )
+        matching_set = self.matcher.match_anchors(source, target, context)
 
-        self.matcher = GumTreeMatcher(min_height=1)
-
-    def test_anchor_matching(self):
-        matching_set = self.matcher.match_anchors(
-            self.source, self.target, self.context
+        assert sorted(self.get_matching_pairs(matching_set, context)) == sorted(
+            expected
         )
 
-        matching_pairs = [
+        flipped_context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(target)},
+            target_nodes={id(x): x for x in pre_order_walk(source)},
+            matching_set=MatchingSet(),
+            edit_script=(),
+        )
+        matching_set = self.matcher.match_anchors(target, source, flipped_context)
+
+        assert sorted(self.get_matching_pairs(matching_set, flipped_context)) == sorted(
+            expected
+        )
+
+    def get_matching_pairs(self, matching_set: MatchingSet, context: DiffContext):
+        return [
             (
                 (
-                    self.context.source_nodes[x.source].label,
-                    self.context.source_nodes[x.source].value,
+                    context.source_nodes[x.source].label,
+                    context.source_nodes[x.source].value,
                 ),
                 (
-                    self.context.target_nodes[x.target].label,
-                    self.context.target_nodes[x.target].value,
+                    context.target_nodes[x.target].label,
+                    context.target_nodes[x.target].value,
                 ),
             )
             for x in matching_set.pairs
         ]
 
-        assert list(sorted(matching_pairs)) == [
-            (("InfixExpression", "=="), ("InfixExpression", "==")),
-            (("Modifier", "public"), ("Modifier", "public")),
-            (("NumberLiteral", "0"), ("NumberLiteral", "0")),
-            (("PrimitiveType", "int"), ("PrimitiveType", "int")),
-            (("ReturnStatement", ""), ("ReturnStatement", "")),
-            (("SimpleName", "String"), ("SimpleName", "String")),
-            (("SimpleName", "Test"), ("SimpleName", "Test")),
-            (("SimpleName", "foo"), ("SimpleName", "foo")),
-            (("SimpleName", "i"), ("SimpleName", "i")),
-            (("SimpleName", "i"), ("SimpleName", "i")),
-            (("SimpleType", "String"), ("SimpleType", "String")),
-            (("SingleVariableDeclaration", ""), ("SingleVariableDeclaration", "")),
-            (("StringLiteral", "Foo!"), ("StringLiteral", "Foo!")),
-        ]
+    def test_anchor_matching_smaller_source(self):
+        self.assert_matched_anchors(
+            self.source,
+            self.target,
+            [
+                (("InfixExpression", "=="), ("InfixExpression", "==")),
+                (("Modifier", "public"), ("Modifier", "public")),
+                (("NumberLiteral", "0"), ("NumberLiteral", "0")),
+                (("PrimitiveType", "int"), ("PrimitiveType", "int")),
+                (("ReturnStatement", ""), ("ReturnStatement", "")),
+                (("SimpleName", "String"), ("SimpleName", "String")),
+                (("SimpleName", "Test"), ("SimpleName", "Test")),
+                (("SimpleName", "foo"), ("SimpleName", "foo")),
+                (("SimpleName", "i"), ("SimpleName", "i")),
+                (("SimpleName", "i"), ("SimpleName", "i")),
+                (("SimpleType", "String"), ("SimpleType", "String")),
+                (("SingleVariableDeclaration", ""), ("SingleVariableDeclaration", "")),
+                (("StringLiteral", "Foo!"), ("StringLiteral", "Foo!")),
+            ],
+        )
