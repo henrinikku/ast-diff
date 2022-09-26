@@ -34,8 +34,16 @@ Kaikki komennot suoritetaan projektin juurikansiossa.
 
 ### Asennus
 
+Asenna riippuvuudet:
+
 ```
 poetry install
+```
+
+Asenna git hookit:
+
+```
+poetry run pre-commit install --install-hooks
 ```
 
 ### Suoritus
