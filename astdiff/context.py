@@ -1,4 +1,4 @@
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Dict, Iterable
 
 from astdiff.ast import Node
@@ -13,17 +13,13 @@ class MatchingPair:
     target: NodeId
 
 
-@dataclass
+@dataclass(frozen=True)
 class MatchingSet:
-    source_target_map: Dict[NodeId, NodeId]
-    target_source_map: Dict[NodeId, NodeId]
-
-    def __init__(self):
-        self.source_target_map = {}
-        self.target_source_map = {}
+    source_target_map: Dict[NodeId, NodeId] = field(default_factory=dict)
+    target_source_map: Dict[NodeId, NodeId] = field(default_factory=dict)
 
     def add(self, pair: MatchingPair):
-        assert self.unmatched(pair)
+        assert not self.matched(pair)
 
         self.source_target_map[pair.source] = pair.target
         self.target_source_map[pair.target] = pair.source
@@ -32,11 +28,11 @@ class MatchingSet:
         for pair in pairs:
             self.add(pair)
 
-    def unmatched(self, pair: MatchingPair):
-        return (
-            pair.source not in self.source_target_map
-            and pair.target not in self.target_source_map
-        )
+    def node_matched(self, node: NodeId):
+        return node in self.source_target_map or node in self.target_source_map
+
+    def matched(self, pair: MatchingPair):
+        return self.node_matched(pair.source) or self.node_matched(pair.target)
 
     @property
     def pairs(self):
@@ -55,8 +51,8 @@ class DiffContext:
     source_nodes: Dict[NodeId, Node]
     target_nodes: Dict[NodeId, Node]
 
-    matching_set: MatchingSet
-    edit_script: EditScript
+    matching_set: MatchingSet = field(default_factory=MatchingSet)
+    edit_script: EditScript = field(default_factory=tuple)
 
     def copy(self, **changes):
         return replace(self, **changes)

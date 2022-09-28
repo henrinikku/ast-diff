@@ -354,6 +354,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "more-itertools"
+version = "8.14.0"
+description = "More routines for operating on iterables, beyond itertools"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
@@ -751,7 +759,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "39ec532feccd4854f5eadab223bdf4efac88a05dbb4bf4808bbecf0efba6c1d7"
+content-hash = "d97da06abbe6bc5317a3a8d9dc94dd288800512c8fe142076d992374e94c23d4"
 
 [metadata.files]
 appnope = [
@@ -800,6 +808,7 @@ jupyter-client = []
 jupyter-core = []
 matplotlib-inline = []
 mccabe = []
+more-itertools = []
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},

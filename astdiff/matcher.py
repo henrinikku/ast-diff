@@ -17,7 +17,7 @@ class Matcher(ABC):
         self,
         source_root: Node,
         target_root: Node,
-        ctx: DiffContext,
+        context: DiffContext,
     ) -> MatchingSet:
         ...
 
@@ -31,7 +31,7 @@ class StubMatcher(Matcher):
         self,
         source_root: Node,
         target_root: Node,
-        ctx: DiffContext,
+        context: MatchingSet,
     ):
         return MatchingSet()
 
@@ -51,6 +51,6 @@ class ChangeDistillingMatcher(Matcher):
         self,
         source_root: Node,
         target_root: Node,
-        ctx: DiffContext,
+        context: DiffContext,
     ):
         raise NotImplementedError()

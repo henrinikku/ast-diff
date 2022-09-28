@@ -23,6 +23,10 @@ def diff(
     target: str,
     log_level: int = typer.Option(logging.INFO),
 ):
+    """
+    Prints an edit script which describes differences between
+    syntax trees produced by source and target.
+    """
     logging.basicConfig(level=log_level)
 
     logger.info("Comparing '%s' and '%s'...", source, target)

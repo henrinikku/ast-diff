@@ -1,21 +1,23 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from functools import partial
 from itertools import product
 from typing import Dict, List, Set
+
+from more_itertools import first
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
 from astdiff.matcher import Matcher
 from astdiff.queue import HeightIndexedPriorityQueue
-from astdiff.traversal import pre_order_walk
+from astdiff.traversal import post_order_walk, pre_order_walk
 
 logger = logging.getLogger(__name__)
 
 # Constants recommended by Falleri et al.
 DEFAULT_MIN_HEIGHT = 2
 DEFAULT_MAX_SIZE = 100
+DEFAULT_MIN_DICE = 0.5
 
 
 class GumTreeMatcher(Matcher):
@@ -27,37 +29,37 @@ class GumTreeMatcher(Matcher):
     """
 
     def __init__(
-        self, min_height: int = DEFAULT_MIN_HEIGHT, max_size: int = DEFAULT_MAX_SIZE
+        self,
+        min_height: int = DEFAULT_MIN_HEIGHT,
+        max_size: int = DEFAULT_MAX_SIZE,
+        min_dice: int = DEFAULT_MIN_DICE,
     ):
         self.min_height = min_height
         self.max_size = max_size
+        self.min_dice = min_dice
 
     def find_matching_nodes(
         self,
         source_root: Node,
         target_root: Node,
-        ctx: DiffContext,
+        context: DiffContext,
     ):
-        anchor_matches = self.match_anchors(source_root, target_root, ctx)
-        container_matches = self.match_containers(source_root, target_root, ctx)
+        self.prepare(context)
 
-        matching_set = MatchingSet()
-        matching_set.update(anchor_matches.pairs)
-        matching_set.update(container_matches.pairs)
+        self.match_anchors(source_root, target_root)
+        self.match_containers(source_root, target_root)
 
-        return matching_set
+        return self.matching_set
 
-    def match_anchors(
-        self,
-        source_root: Node,
-        target_root: Node,
-        ctx: DiffContext,
-    ):
+    def prepare(self, context: DiffContext):
+        self.context = context
+        self.matching_set = MatchingSet()
+
+    def match_anchors(self, source_root: Node, target_root: Node):
         """
         Performs greedy top-down search of the greatest isomorphic subtrees
         between source and target.
         """
-        matching_set = MatchingSet()
         candidate_mappings: List[Mapping] = []
 
         source_queue = HeightIndexedPriorityQueue()
@@ -90,18 +92,20 @@ class GumTreeMatcher(Matcher):
                 # they can be matched directly. This also implies that their
                 # descendants can be matched.
                 for mapping in mappings.unique_mappings():
-                    source_id = next(iter(mapping.source_ids))
-                    target_id = next(iter(mapping.target_ids))
-                    matching_set.update(_descendant_matches(source_id, target_id, ctx))
+                    match = MatchingPair(
+                        source=first(mapping.source_ids),
+                        target=first(mapping.target_ids),
+                    )
+                    self.matching_set.update(self._descendant_matches(match))
 
                 # Unmatched nodes are simply skipped since trees have to be of the same
                 # height to be isomorphic.
                 for mapping in mappings.unmatched_mappings():
                     for source_id in mapping.source_ids:
-                        source_queue.open(ctx.source_nodes[source_id])
+                        source_queue.open(self.context.source_nodes[source_id])
 
                     for target_id in mapping.target_ids:
-                        target_queue.open(ctx.target_nodes[target_id])
+                        target_queue.open(self.context.target_nodes[target_id])
 
                 # Nodes with more than one possible mapping are handled separately.
                 candidate_mappings.extend(mappings.candidate_mappings())
@@ -109,75 +113,66 @@ class GumTreeMatcher(Matcher):
         logger.debug("Resolving %s candidate mappings...", len(candidate_mappings))
 
         # Mappings with more descendants are considered first.
-        candidate_mappings.sort(key=lambda x: x.max_size(ctx), reverse=True)
-
-        # Candidate matches are given priority based on dice coefficient.
-        dice_func = partial(_dice_coefficient, ctx=ctx, matching_set=matching_set)
-
-        # TODO: Consider caching dice coefficient.
-        # dice_func = cache(dice_func)
+        candidate_mappings.sort(key=lambda x: x.max_size(self.context), reverse=True)
 
         for mapping in candidate_mappings:
-            candidate_matches = (
-                MatchingPair(s, t)
-                for s, t in product(mapping.source_ids, mapping.target_ids)
+            candidate_matches = sorted(
+                (
+                    MatchingPair(s, t)
+                    for s, t in product(mapping.source_ids, mapping.target_ids)
+                ),
+                key=self._dice_coefficient,
+                reverse=True,
             )
 
-            for match in sorted(candidate_matches, key=dice_func, reverse=True):
-                if matching_set.unmatched(match):
-                    matching_set.update(
-                        _descendant_matches(match.source, match.target, ctx)
-                    )
+            for match in candidate_matches:
+                if not self.matching_set.matched(match):
+                    self.matching_set.update(self._descendant_matches(match))
 
-        return matching_set
+        return self.matching_set
 
-    def match_containers(
-        self,
-        source_root: Node,
-        target_root: Node,
-        ctx: DiffContext,
-    ):
-        # TODO: Add bottom-up phase
-        return MatchingSet()
+    def match_containers(self, source_root: Node, target_root: Node):
+        for source_node in post_order_walk(source_root):
+            # TODO: Get and match candidates
+            # TODO: Implement min edit distance to look for additional mappings
+            pass
 
+        return self.matching_set
 
-def _descendant_matches(source_id: NodeId, target_id: NodeId, ctx: DiffContext):
-    source = ctx.source_nodes[source_id]
-    target = ctx.target_nodes[target_id]
+    def _descendant_matches(self, match: MatchingPair):
+        source = self.context.source_nodes[match.source]
+        target = self.context.target_nodes[match.target]
 
-    assert source.isomorphic_to(target)
-    assert len(source.children) == len(target.children)
+        assert source.isomorphic_to(target)
+        assert len(source.children) == len(target.children)
 
-    yield MatchingPair(
-        source=source_id,
-        target=target_id,
-    )
+        yield match
 
-    for source_child, target_child in zip(source.children, target.children):
-        yield from _descendant_matches(id(source_child), id(target_child), ctx)
+        for source_child, target_child in zip(source.children, target.children):
+            child_match = MatchingPair(id(source_child), id(target_child))
+            yield from self._descendant_matches(child_match)
 
+    def _dice_coefficient(self, match: MatchingPair):
+        """
+        Measures the ratio of common descendants between two nodes.
+        """
+        source_node = self.context.source_nodes[match.source]
+        target_node = self.context.target_nodes[match.target]
 
-def _dice_coefficient(match: MatchingPair, ctx: DiffContext, matching_set: MatchingSet):
-    """
-    Measures the ratio of common descendants between two nodes.
-    """
-    source_node = ctx.source_nodes[match.source]
-    target_node = ctx.target_nodes[match.target]
+        source_node = source_node.parent or source_node
+        target_node = target_node.parent or target_node
 
-    source_node = source_node.parent or source_node
-    target_node = target_node.parent or target_node
+        source_descendants = set(id(x) for x in _descendants(source_node))
+        target_descendants = set(id(x) for x in _descendants(target_node))
 
-    source_descendants = set(id(x) for x in _descendants(source_node))
-    target_descendants = set(id(x) for x in _descendants(target_node))
+        common_descendant_matches = sum(
+            self.matching_set.source_target_map.get(x) in target_descendants
+            for x in source_descendants
+        )
 
-    common_descendant_matches = sum(
-        matching_set.source_target_map.get(x) in target_descendants
-        for x in source_descendants
-    )
-
-    return (2 * common_descendant_matches) / (
-        len(source_descendants) + len(target_descendants)
-    )
+        return (2 * common_descendant_matches) / (
+            len(source_descendants) + len(target_descendants)
+        )
 
 
 def _descendants(node: Node):

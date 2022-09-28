@@ -11,7 +11,7 @@ class EditScriptGenerator(ABC):
     """
 
     @abstractmethod
-    def generate_edit_script(self, ctx: DiffContext) -> EditScript:
+    def generate_edit_script(self, context: DiffContext) -> EditScript:
         ...
 
 
@@ -22,14 +22,18 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
     Source: Chawathe et al. 1996 https://dl.acm.org/doi/pdf/10.1145/235968.233366
     """
 
-    def generate_edit_script(self, ctx: DiffContext):
+    def generate_edit_script(self, context: DiffContext):
         ops = []
 
-        inserted_ids = ctx.unmatched_target_ids
-        ops += [Insert(ctx.target_nodes[x].standalone()) for x in inserted_ids]
+        ops += (
+            Delete(context.source_nodes[x].standalone())
+            for x in context.unmatched_source_ids
+        )
 
-        deleted_ids = ctx.unmatched_source_ids
-        ops += [Delete(ctx.source_nodes[x].standalone()) for x in deleted_ids]
+        ops += (
+            Insert(context.target_nodes[x].standalone())
+            for x in context.unmatched_target_ids
+        )
 
         # TODO: Generate moves and updates
         return tuple(ops)

@@ -1,7 +1,7 @@
 import logging
 
 from astdiff.ast import Node
-from astdiff.context import DiffContext, MatchingSet
+from astdiff.context import DiffContext
 from astdiff.gumtree import GumTreeMatcher
 from astdiff.matcher import Matcher
 from astdiff.script_generator import EditScriptGenerator, WithMoveEditScriptGenerator
@@ -29,8 +29,6 @@ class Differ:
         ctx = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(source_ast)},
             target_nodes={id(x): x for x in pre_order_walk(target_ast)},
-            matching_set=MatchingSet(),
-            edit_script=(),
         )
 
         # TODO: Add a separate class that takes a DiffContext and prints debug info.

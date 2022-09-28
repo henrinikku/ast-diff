@@ -13,7 +13,7 @@ Pair = Tuple[str, str]
 class GumTreeMatcherTest(unittest.TestCase):
     def setUp(self):
         """
-        For visualization of the tree below, see page 4.
+        For visualization of the tree below, see page 4 of
         https://hal.archives-ouvertes.fr/hal-01054552/document
         """
 
@@ -211,25 +211,20 @@ class GumTreeMatcherTest(unittest.TestCase):
         context = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(source)},
             target_nodes={id(x): x for x in pre_order_walk(target)},
-            matching_set=MatchingSet(),
-            edit_script=(),
         )
-        matching_set = self.matcher.match_anchors(source, target, context)
+        self.matcher.prepare(context)
+        matching_set = self.matcher.match_anchors(source, target)
 
-        assert sorted(self.get_matching_pairs(matching_set, context)) == sorted(
-            expected
-        )
+        assert sorted(self.get_matching_pairs(matching_set, context)) == expected
 
         flipped_context = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(target)},
             target_nodes={id(x): x for x in pre_order_walk(source)},
-            matching_set=MatchingSet(),
-            edit_script=(),
         )
-        matching_set = self.matcher.match_anchors(target, source, flipped_context)
-
-        assert sorted(self.get_matching_pairs(matching_set, flipped_context)) == sorted(
-            expected
+        self.matcher.prepare(flipped_context)
+        matching_set = self.matcher.match_anchors(target, source)
+        assert (
+            sorted(self.get_matching_pairs(matching_set, flipped_context)) == expected
         )
 
     def get_matching_pairs(self, matching_set: MatchingSet, context: DiffContext):
