@@ -1,13 +1,10 @@
 import unittest
-from typing import List, Tuple
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingSet
 from astdiff.gumtree import GumTreeMatcher
 from astdiff.metadata import add_parents, attach_metadata
 from astdiff.traversal import pre_order_walk
-
-Pair = Tuple[str, str]
 
 
 class GumTreeMatcherTest(unittest.TestCase):
@@ -200,32 +197,6 @@ class GumTreeMatcherTest(unittest.TestCase):
 
         self.matcher = GumTreeMatcher(min_height=1)
 
-    def assert_matched_anchors(
-        self,
-        source: Node,
-        target: Node,
-        expected: List[Tuple[Pair, Pair]],
-    ):
-        expected = sorted(expected)
-
-        context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(source)},
-            target_nodes={id(x): x for x in pre_order_walk(target)},
-        )
-        self.matcher.prepare(context)
-        matching_set = self.matcher.match_anchors(source, target)
-        assert sorted(self.get_matching_pairs(matching_set, context)) == expected
-
-        flipped_context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(target)},
-            target_nodes={id(x): x for x in pre_order_walk(source)},
-        )
-        self.matcher.prepare(flipped_context)
-        matching_set = self.matcher.match_anchors(target, source)
-        assert (
-            sorted(self.get_matching_pairs(matching_set, flipped_context)) == expected
-        )
-
     def get_matching_pairs(self, matching_set: MatchingSet, context: DiffContext):
         return [
             (
@@ -241,10 +212,8 @@ class GumTreeMatcherTest(unittest.TestCase):
             for x in matching_set.pairs
         ]
 
-    def test_anchor_matching_smaller_source(self):
-        self.assert_matched_anchors(
-            self.source,
-            self.target,
+    def test_anchor_matching(self):
+        expected = sorted(
             [
                 (("InfixExpression", "=="), ("InfixExpression", "==")),
                 (("Modifier", "public"), ("Modifier", "public")),
@@ -259,5 +228,25 @@ class GumTreeMatcherTest(unittest.TestCase):
                 (("SimpleType", "String"), ("SimpleType", "String")),
                 (("SingleVariableDeclaration", ""), ("SingleVariableDeclaration", "")),
                 (("StringLiteral", "Foo!"), ("StringLiteral", "Foo!")),
-            ],
+            ]
+        )
+
+        context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(self.source)},
+            target_nodes={id(x): x for x in pre_order_walk(self.target)},
+        )
+        self.matcher.prepare(context)
+
+        matching_set = self.matcher.match_anchors(self.source, self.target)
+        assert sorted(self.get_matching_pairs(matching_set, context)) == expected
+
+        flipped_context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(self.target)},
+            target_nodes={id(x): x for x in pre_order_walk(self.source)},
+        )
+        self.matcher.prepare(flipped_context)
+
+        matching_set = self.matcher.match_anchors(self.target, self.source)
+        assert (
+            sorted(self.get_matching_pairs(matching_set, flipped_context)) == expected
         )
