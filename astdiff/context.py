@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field, replace
+from functools import total_ordering
 from typing import Dict, Iterable
 
 from astdiff.ast import Node
@@ -7,10 +8,14 @@ from astdiff.edit_script import EditScript
 NodeId = int
 
 
+@total_ordering
 @dataclass(frozen=True)
 class MatchingPair:
     source: NodeId
     target: NodeId
+
+    def __lt__(self, other: "MatchingPair"):
+        return (self.source, self.target) < (other.source, other.target)
 
 
 @dataclass(frozen=True)
@@ -28,11 +33,15 @@ class MatchingSet:
         for pair in pairs:
             self.add(pair)
 
-    def node_matched(self, node: NodeId):
-        return node in self.source_target_map or node in self.target_source_map
-
     def matched(self, pair: MatchingPair):
-        return self.node_matched(pair.source) or self.node_matched(pair.target)
+        return (
+            pair.source in self.source_target_map
+            and pair.target in self.target_source_map
+        )
+
+    def __len__(self):
+        assert len(self.source_target_map) == len(self.target_source_map)
+        return len(self.source_target_map)
 
     @property
     def pairs(self):

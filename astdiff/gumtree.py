@@ -2,6 +2,7 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
+from math import inf
 from typing import Dict, List, Set
 
 from more_itertools import first
@@ -132,12 +133,44 @@ class GumTreeMatcher(Matcher):
         return self.matching_set
 
     def match_containers(self, source_root: Node, target_root: Node):
+        matches_before = len(self.matching_set)
+
         for source_node in post_order_walk(source_root):
-            # TODO: Get and match candidates
-            # TODO: Implement min edit distance to look for additional mappings
-            pass
+            candidate_matches = self._find_candidate_container_matches(source_node)
+            weighted_candidate_matches = (
+                (self._dice_coefficient(x), x) for x in candidate_matches
+            )
+
+            dice, match = max(weighted_candidate_matches, default=(-inf, None))
+            if dice >= self.min_dice:
+                self.matching_set.add(match)
+                # TODO: Look for additional matches based based on min edit distance.
+
+        matches_after = len(self.matching_set)
+        logger.debug(
+            "Found %s matches during container matching", matches_after - matches_before
+        )
 
         return self.matching_set
+
+    def _find_candidate_container_matches(self, source_node: Node):
+        seen = set()
+        for source_descendant in _descendants(source_node):
+            target_id = self.matching_set.source_target_map.get(id(source_descendant))
+            if target_id is None:
+                continue
+
+            target_node = self.context.target_nodes[target_id]
+            while not target_node.is_root:
+                target_node = target_node.parent
+                if id(target_node) in seen:
+                    break
+
+                target_matched = id(target_node) in self.matching_set.target_source_map
+                if not target_matched and source_node.can_match(target_node):
+                    yield MatchingPair(id(source_node), id(target_node))
+
+                seen.add(id(target_node))
 
     def _descendant_matches(self, match: MatchingPair):
         source = self.context.source_nodes[match.source]

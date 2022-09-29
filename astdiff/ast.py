@@ -28,8 +28,15 @@ class Node:
     def is_leaf(self):
         return not self.children
 
+    @property
+    def is_root(self):
+        return not self.parent
+
     def standalone(self):
-        return replace(self, children=(), metadata=None)
+        return replace(self, children=(), parent=None, metadata=None)
+
+    def can_match(self, other: "Node"):
+        return (self.label, self.is_root) == (other.label, other.is_root)
 
     def isomorphic_to(self, other: "Node"):
         """

@@ -32,8 +32,6 @@ class Differ:
         )
 
         # TODO: Add a separate class that takes a DiffContext and prints debug info.
-        logger.debug("Source:\n%s", source_ast)
-        logger.debug("Target:\n%s", target_ast)
         logger.debug(
             "%s + %s = %s nodes in total",
             len(ctx.source_nodes),

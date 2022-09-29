@@ -214,7 +214,6 @@ class GumTreeMatcherTest(unittest.TestCase):
         )
         self.matcher.prepare(context)
         matching_set = self.matcher.match_anchors(source, target)
-
         assert sorted(self.get_matching_pairs(matching_set, context)) == expected
 
         flipped_context = DiffContext(
