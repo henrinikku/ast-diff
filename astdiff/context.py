@@ -36,7 +36,7 @@ class MatchingSet:
     def matched(self, pair: MatchingPair):
         return (
             pair.source in self.source_target_map
-            and pair.target in self.target_source_map
+            or pair.target in self.target_source_map
         )
 
     def __len__(self):
