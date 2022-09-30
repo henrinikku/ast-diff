@@ -144,7 +144,7 @@ class GumTreeMatcher(Matcher):
             dice, match = max(weighted_candidate_matches, default=(-inf, None))
             if dice >= self.min_dice:
                 self.matching_set.add(match)
-                # TODO: Look for additional matches based based on min edit distance.
+                # TODO: Look for recovery mappings based on min edit distance.
 
         matches_after = len(self.matching_set)
         logger.debug(
