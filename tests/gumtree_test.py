@@ -10,7 +10,7 @@ from astdiff.traversal import pre_order_walk
 class GumTreeMatcherTest(unittest.TestCase):
     def setUp(self):
         """
-        For visualization of the tree below, see page 4 of
+        For visualization of the tree below, see figure 1 in page 4 of
         https://hal.archives-ouvertes.fr/hal-01054552/document
         """
 
@@ -195,7 +195,7 @@ class GumTreeMatcherTest(unittest.TestCase):
         attach_metadata(self.source)
         attach_metadata(self.target)
 
-        self.matcher = GumTreeMatcher(min_height=1)
+        self.matcher = GumTreeMatcher()
 
     def get_matching_pairs(self, matching_set: MatchingSet, context: DiffContext):
         return [
@@ -213,23 +213,18 @@ class GumTreeMatcherTest(unittest.TestCase):
         ]
 
     def test_anchor_matching(self):
-        expected = sorted(
-            [
-                (("InfixExpression", "=="), ("InfixExpression", "==")),
-                (("Modifier", "public"), ("Modifier", "public")),
-                (("NumberLiteral", "0"), ("NumberLiteral", "0")),
-                (("PrimitiveType", "int"), ("PrimitiveType", "int")),
-                (("ReturnStatement", ""), ("ReturnStatement", "")),
-                (("SimpleName", "String"), ("SimpleName", "String")),
-                (("SimpleName", "Test"), ("SimpleName", "Test")),
-                (("SimpleName", "foo"), ("SimpleName", "foo")),
-                (("SimpleName", "i"), ("SimpleName", "i")),
-                (("SimpleName", "i"), ("SimpleName", "i")),
-                (("SimpleType", "String"), ("SimpleType", "String")),
-                (("SingleVariableDeclaration", ""), ("SingleVariableDeclaration", "")),
-                (("StringLiteral", "Foo!"), ("StringLiteral", "Foo!")),
-            ]
-        )
+        expected = [
+            (("InfixExpression", "=="), ("InfixExpression", "==")),
+            (("SimpleName", "i"), ("SimpleName", "i")),
+            (("NumberLiteral", "0"), ("NumberLiteral", "0")),
+            (("ReturnStatement", ""), ("ReturnStatement", "")),
+            (("StringLiteral", "Foo!"), ("StringLiteral", "Foo!")),
+            (("SimpleType", "String"), ("SimpleType", "String")),
+            (("SimpleName", "String"), ("SimpleName", "String")),
+            (("SingleVariableDeclaration", ""), ("SingleVariableDeclaration", "")),
+            (("PrimitiveType", "int"), ("PrimitiveType", "int")),
+            (("SimpleName", "i"), ("SimpleName", "i")),
+        ]
 
         context = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(self.source)},
@@ -238,7 +233,7 @@ class GumTreeMatcherTest(unittest.TestCase):
         self.matcher.prepare(context)
 
         matching_set = self.matcher.match_anchors(self.source, self.target)
-        assert sorted(self.get_matching_pairs(matching_set, context)) == expected
+        assert self.get_matching_pairs(matching_set, context) == expected
 
         flipped_context = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(self.target)},
@@ -247,6 +242,47 @@ class GumTreeMatcherTest(unittest.TestCase):
         self.matcher.prepare(flipped_context)
 
         matching_set = self.matcher.match_anchors(self.target, self.source)
-        assert (
-            sorted(self.get_matching_pairs(matching_set, flipped_context)) == expected
+        assert self.get_matching_pairs(matching_set, flipped_context) == expected
+
+    def test_container_matching(self):
+        expected = [
+            (("IfStatement", ""), ("IfStatement", "")),
+            (("Block", ""), ("Block", "")),
+            (("MethodDeclaration", ""), ("MethodDeclaration", "")),
+            (("TypeDeclaration", ""), ("TypeDeclaration", "")),
+            (("CompilationUnit", ""), ("CompilationUnit", "")),
+        ]
+
+        context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(self.source)},
+            target_nodes={id(x): x for x in pre_order_walk(self.target)},
         )
+        self.matcher.prepare(context)
+
+        matched_anchors = self.get_matching_pairs(
+            self.matcher.match_anchors(self.source, self.target),
+            context,
+        )
+        matched_nodes = self.get_matching_pairs(
+            self.matcher.match_containers(self.source, self.target),
+            context,
+        )
+        matched_containers = matched_nodes[len(matched_anchors) :]
+        assert matched_containers == expected
+
+        flipped_context = DiffContext(
+            source_nodes={id(x): x for x in pre_order_walk(self.target)},
+            target_nodes={id(x): x for x in pre_order_walk(self.source)},
+        )
+        self.matcher.prepare(flipped_context)
+
+        matched_anchors = self.get_matching_pairs(
+            self.matcher.match_anchors(self.target, self.source),
+            flipped_context,
+        )
+        matched_nodes = self.get_matching_pairs(
+            self.matcher.match_containers(self.target, self.source),
+            flipped_context,
+        )
+        matched_containers = matched_nodes[len(matched_anchors) :]
+        assert matched_containers == expected

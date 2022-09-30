@@ -154,6 +154,9 @@ class GumTreeMatcher(Matcher):
         return self.matching_set
 
     def _find_candidate_container_matches(self, source_node: Node):
+        """
+        Yields target nodes matched with descendants of given source node.
+        """
         seen = set()
         for source_descendant in _descendants(source_node):
             target_id = self.matching_set.source_target_map.get(id(source_descendant))
@@ -161,7 +164,7 @@ class GumTreeMatcher(Matcher):
                 continue
 
             target_node = self.context.target_nodes[target_id]
-            while not target_node.is_root:
+            while target_node.parent:
                 target_node = target_node.parent
                 if id(target_node) in seen:
                     break
