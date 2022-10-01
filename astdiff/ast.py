@@ -13,6 +13,7 @@ class NodeMetadata:
 
     height: int
     size: int
+    position: int = 0
 
 
 @total_ordering

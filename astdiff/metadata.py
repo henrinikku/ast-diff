@@ -1,5 +1,7 @@
+from dataclasses import replace
+
 from astdiff.ast import Node, NodeMetadata
-from astdiff.traversal import post_order_walk
+from astdiff.traversal import bfs, post_order_walk
 
 _HASH_START = "start"
 _HASH_END = "end"
@@ -23,6 +25,9 @@ def attach_metadata(tree: Node):
             height=_calculate_height(node),
             hashcode=_calculate_hash(node),
         )
+
+    for pos, node in enumerate(bfs(tree)):
+        node.metadata = replace(node.metadata, position=pos)
 
 
 def _calculate_size(node: Node):
@@ -57,6 +62,7 @@ def _calculate_hash(node: Node):
 
 
 def _hash_node(node: Node, mid_hash: int, exponent: int):
+    # TODO: Consider ignoring node.value in order to better detect updates.
     return sum(
         (
             hash((node.label, node.value, _HASH_START)),

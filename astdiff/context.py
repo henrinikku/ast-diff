@@ -67,17 +67,8 @@ class DiffContext:
         return replace(self, **changes)
 
     @property
-    def matched_source_ids(self):
-        return set(self.matching_set.source_target_map)
-
-    @property
-    def matched_target_ids(self):
-        return set(self.matching_set.target_source_map)
-
-    @property
-    def unmatched_source_ids(self):
-        return set(self.source_nodes) - self.matched_source_ids
-
-    @property
-    def unmatched_target_ids(self):
-        return set(self.target_nodes) - self.matched_target_ids
+    def matched_nodes(self):
+        return (
+            (self.source_nodes[x.source], self.target_nodes[x.target])
+            for x in self.matching_set.pairs
+        )
