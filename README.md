@@ -23,6 +23,11 @@
 - [Viikkoraportti 3](docs/viikko3.md)
 - [Testausdokumentti](docs/testausdokumentti.md)
 
+### Viikko 4
+
+- [Viikkoraportti 4](docs/viikko4.md)
+- [Toteutusdokumentti](docs/toteutusdokumentti.md)
+
 ## Käyttöohjeet
 
 Kaikki komennot suoritetaan projektin juurikansiossa.
