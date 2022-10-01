@@ -4,7 +4,7 @@
 
 ### Miten testataan
 
-Projektin testaus perustuu ainakin toistaiseksi kattaviin yksikkötesteihin. Suorituskykyä mittaavia testejä en ole toteuttanut vielä, mutta haluaisin lisätä ne jossain vaiheessa. Saatan myös lisätä myöhemmin integraatiotestejä käyttöliittymän testaamiseksi. Mikäli pisteiden saamiseen vaaditaan tietyn tyyppisten testien lisäämistä, lisään tarvittavat testit.
+Projektin testaus perustuu ainakin toistaiseksi kattaviin yksikkötesteihin. Olen lisännyt alustavia suorituskykyä mittaavia testejä `pytest-benchmark`-kirjaston avulla. Toistaiseksi näitä löytyy ainoastaan GumTreeMatcher-luokalle. Tavoitteena on lisätä jatkossa lisää suorituskykytestejä isommilla syötteilllä. Saatan myös lisätä myöhemmin integraatiotestejä käyttöliittymän testaamiseksi.
 
 ### Testien suorittaminen
 
