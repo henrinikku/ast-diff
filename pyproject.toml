@@ -21,6 +21,7 @@ coverage = { extras = ["toml"], version = "^6.4.4" }
 flake8 = "^5.0.4"
 isort = "^5.10.1"
 pre-commit = "^2.20.0"
+pytest-benchmark = "^3.4.1"
 
 [tool.black]
 extend-exclude = "tests/data"
