@@ -23,6 +23,9 @@ isort = "^5.10.1"
 pre-commit = "^2.20.0"
 pytest-benchmark = "^3.4.1"
 
+[tool.pytest.ini_options]
+addopts = "--benchmark-disable"
+
 [tool.black]
 extend-exclude = "tests/data"
 
