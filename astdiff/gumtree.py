@@ -11,7 +11,7 @@ from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
 from astdiff.matcher import Matcher
 from astdiff.queue import HeightIndexedPriorityQueue
-from astdiff.traversal import post_order_walk, pre_order_walk
+from astdiff.traversal import descendants, post_order_walk
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +158,7 @@ class GumTreeMatcher(Matcher):
         Yields target nodes matched with descendants of given source node.
         """
         seen = set()
-        for source_descendant in _descendants(source_node):
+        for source_descendant in descendants(source_node):
             target_id = self.matching_set.source_target_map.get(id(source_descendant))
             if target_id is None:
                 continue
@@ -198,8 +198,8 @@ class GumTreeMatcher(Matcher):
         source_node = source_node.parent or source_node
         target_node = target_node.parent or target_node
 
-        source_descendants = set(id(x) for x in _descendants(source_node))
-        target_descendants = set(id(x) for x in _descendants(target_node))
+        source_descendants = set(id(x) for x in descendants(source_node))
+        target_descendants = set(id(x) for x in descendants(target_node))
 
         common_descendant_matches = sum(
             self.matching_set.source_target_map.get(x) in target_descendants
@@ -209,12 +209,6 @@ class GumTreeMatcher(Matcher):
         return (2 * common_descendant_matches) / (
             len(source_descendants) + len(target_descendants)
         )
-
-
-def _descendants(node: Node):
-    descendants = pre_order_walk(node)
-    next(descendants)
-    yield from descendants
 
 
 @dataclass

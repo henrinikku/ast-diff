@@ -3,6 +3,12 @@ from collections import deque
 from astdiff.ast import Node
 
 
+def descendants(node: Node):
+    descendant_nodes = pre_order_walk(node)
+    next(descendant_nodes)
+    yield from descendant_nodes
+
+
 def pre_order_walk(node: Node):
     yield node
 
