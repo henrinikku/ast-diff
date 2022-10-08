@@ -28,6 +28,10 @@
 - [Viikkoraportti 4](docs/viikko4.md)
 - [Toteutusdokumentti](docs/toteutusdokumentti.md)
 
+### Viikko 5
+
+- [Viikkoraportti 5](docs/viikko5.md)
+
 ## Käyttöohjeet
 
 Kaikki komennot suoritetaan projektin juurikansiossa.
