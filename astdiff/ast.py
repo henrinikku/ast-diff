@@ -33,6 +33,21 @@ class Node:
     def is_root(self):
         return not self.parent
 
+    @property
+    def position(self):
+        return next(
+            (i for i, sibling in enumerate(self.siblings) if self is sibling), None
+        )
+
+    @property
+    def siblings(self):
+        return (self.parent and self.parent.children) or tuple()
+
+    @siblings.setter
+    def siblings(self, value: Tuple["Node", ...]):
+        if self.parent:
+            self.parent.children = value
+
     def standalone(self):
         return replace(self, children=(), parent=None, metadata=None)
 

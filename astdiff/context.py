@@ -2,6 +2,8 @@ from dataclasses import dataclass, field, replace
 from functools import total_ordering
 from typing import Dict, Iterable
 
+from more_itertools import first
+
 from astdiff.ast import Node
 from astdiff.edit_script import EditScript
 
@@ -65,6 +67,60 @@ class DiffContext:
 
     def copy(self, **changes):
         return replace(self, **changes)
+
+    # TODO: Finish and use before edit script generation
+    # def deepcopy(self):
+    #     old_source_root = first(self.source_nodes.values())
+    #     old_target_root = first(self.target_nodes.values())
+
+    #     new_source_root = copy.deepcopy(old_source_root)
+    #     new_target_root = copy.deepcopy(old_target_root)
+
+    #     old_new_id_map = {
+    #         id(old_node): id(new_node)
+    #         for old_node, new_node in chain(
+    #             zip(pre_order_walk(old_source_root), pre_order_walk(new_source_root)),
+    #             zip(pre_order_walk(old_target_root), pre_order_walk(new_target_root)),
+    #         )
+    #     }
+
+    #     new_source_target_map = {
+    #         old_new_id_map[k]: old_new_id_map[v]
+    #         for k, v in self.matching_set.source_target_map.items()
+    #     }
+    #     new_target_source_map = {
+    #         old_new_id_map[k]: old_new_id_map[v]
+    #         for k, v in self.matching_set.target_source_map.items()
+    #     }
+
+    #     new_source_nodes = {id(x) for x in pre_order_walk(new_source_root)}
+    #     new_target_nodes = {id(x) for x in pre_order_walk(new_target_root)}
+
+    #     return DiffContext(
+    #         source_nodes=new_source_nodes,
+    #         target_nodes=new_target_nodes,
+    #         matching_set=MatchingSet(new_source_target_map, new_target_source_map),
+    #         edit_script=copy.copy(self.edit_script),
+    #     )
+
+    def partner(self, node: Node):
+        target_id = self.matching_set.source_target_map.get(id(node))
+        if target_id is not None:
+            return self.target_nodes[target_id]
+
+        source_id = self.matching_set.target_source_map.get(id(node))
+        if source_id is not None:
+            return self.source_nodes[source_id]
+
+        return None
+
+    @property
+    def source_root(self):
+        return first(self.source_nodes.values())
+
+    @property
+    def target_root(self):
+        return first(self.target_nodes.values())
 
     @property
     def matched_nodes(self):

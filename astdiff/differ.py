@@ -26,6 +26,7 @@ class Differ:
     def diff(self, source_ast: Node, target_ast: Node):
         logger.debug("Diffing...")
 
+        # TODO: Add constructor for diffcontext
         ctx = DiffContext(
             source_nodes={id(x): x for x in pre_order_walk(source_ast)},
             target_nodes={id(x): x for x in pre_order_walk(target_ast)},
