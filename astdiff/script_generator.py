@@ -126,8 +126,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             rightmost = sibling
 
         source = self.context.partner(rightmost)
-        position = (source and source.position) or -1
-        return position + 1
+        return 0 if source is None else source.position + 1
 
     def longest_common_subsequence(
         self, source_nodes: Sequence[Node], target_nodes: Sequence[Node]
