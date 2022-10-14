@@ -1,7 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
 
-from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingSet
 
 logger = logging.getLogger(__name__)
@@ -13,12 +12,7 @@ class Matcher(ABC):
     """
 
     @abstractmethod
-    def find_matching_nodes(
-        self,
-        source_root: Node,
-        target_root: Node,
-        context: DiffContext,
-    ) -> MatchingSet:
+    def find_matching_nodes(self, context: DiffContext) -> MatchingSet:
         ...
 
 
@@ -27,12 +21,7 @@ class StubMatcher(Matcher):
     Dummy matcher that never matches any nodes.
     """
 
-    def find_matching_nodes(
-        self,
-        source_root: Node,
-        target_root: Node,
-        context: MatchingSet,
-    ):
+    def find_matching_nodes(self, context: DiffContext):
         return MatchingSet()
 
 
@@ -47,10 +36,5 @@ class ChangeDistillingMatcher(Matcher):
     http://serg.aau.at/pub/MartinPinzger/Publications/Fluri2007-changedistiller.pdf
     """
 
-    def find_matching_nodes(
-        self,
-        source_root: Node,
-        target_root: Node,
-        context: DiffContext,
-    ):
+    def find_matching_nodes(self, context: DiffContext):
         raise NotImplementedError()

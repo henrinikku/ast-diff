@@ -41,7 +41,7 @@ class Differ:
         )
 
         logger.debug("Finding matching nodes...")
-        ctx.matching_set = self.matcher.find_matching_nodes(source_ast, target_ast, ctx)
+        ctx.matching_set = self.matcher.find_matching_nodes(ctx)
 
         logger.debug("Generating edit script...")
         ctx.edit_script = self.generator.generate_edit_script(ctx)

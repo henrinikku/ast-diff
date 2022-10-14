@@ -39,16 +39,11 @@ class GumTreeMatcher(Matcher):
         self.max_size = max_size
         self.min_dice = min_dice
 
-    def find_matching_nodes(
-        self,
-        source_root: Node,
-        target_root: Node,
-        context: DiffContext,
-    ):
+    def find_matching_nodes(self, context: DiffContext):
         self.prepare(context)
 
-        self.match_anchors(source_root, target_root)
-        self.match_containers(source_root, target_root)
+        self.match_anchors(context.source_root, context.target_root)
+        self.match_containers(context.source_root, context.target_root)
 
         return self.matching_set
 
@@ -136,15 +131,19 @@ class GumTreeMatcher(Matcher):
         matches_before = len(self.matching_set)
 
         for source_node in post_order_walk(source_root):
-            candidate_matches = self._find_candidate_container_matches(source_node)
-            weighted_candidate_matches = (
-                (self._dice_coefficient(x), x) for x in candidate_matches
-            )
+            if source_node.is_root:
+                self.matching_set.add(MatchingPair(id(source_root), id(target_root)))
 
-            dice, match = max(weighted_candidate_matches, default=(-inf, None))
-            if dice >= self.min_dice:
-                self.matching_set.add(match)
-                # TODO: Look for recovery mappings based on min edit distance.
+            else:
+                candidate_matches = self._find_candidate_container_matches(source_node)
+                weighted_candidate_matches = (
+                    (self._dice_coefficient(x), x) for x in candidate_matches
+                )
+
+                dice, match = max(weighted_candidate_matches, default=(-inf, None))
+                if dice >= self.min_dice:
+                    self.matching_set.add(match)
+                    # TODO: Look for recovery mappings based on min edit distance.
 
         matches_after = len(self.matching_set)
         logger.debug(

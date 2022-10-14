@@ -63,7 +63,19 @@ class DiffContext:
     target_nodes: Dict[NodeId, Node]
 
     matching_set: MatchingSet = field(default_factory=MatchingSet)
-    edit_script: EditScript = field(default_factory=tuple)
+    edit_script: EditScript = field(default_factory=EditScript)
+
+    def add_source(self, node: Node):
+        assert id(node) not in self.source_nodes
+        self.source_nodes[id(node)] = node
+        for child in node.children:
+            self.add_source(child)
+
+    def remove_source(self, node: Node):
+        assert id(node) in self.source_nodes
+        self.source_nodes.pop(id(node))
+        for child in node.children:
+            self.remove_source(child)
 
     def copy(self, **changes):
         return replace(self, **changes)

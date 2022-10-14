@@ -31,7 +31,7 @@ class Node:
 
     @property
     def is_root(self):
-        return not self.parent
+        return self.parent is None
 
     @property
     def position(self):

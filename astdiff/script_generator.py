@@ -1,9 +1,10 @@
 import logging
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from itertools import product
-from typing import List, Sequence, Set
+from typing import Callable, List, Sequence, Set
 
-from more_itertools import first
+from more_itertools import first, peekable
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, NodeId
@@ -53,25 +54,34 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             if not source:
                 position = self._find_position(target)
                 source = Node(target.label, target.value)
-                self.ops.append(Insert(source, source_parent, position))
-                # context.matching_set.add(MatchingPair(id(source), id(target)))
+                insert = Insert(source, source_parent, position)
+                insert.apply()
+                self.ops.append(insert)
+                context.add_source(source)
+                context.matching_set.add(MatchingPair(id(source), id(target)))
 
             elif not target.is_root:
                 if source.value != target.value:
-                    self.ops.append(Update(source, target))
+                    update = Update(source, target)
+                    update.apply()
+                    self.ops.append(update)
 
                 if context.matching_set.source_target_map.get(id(source.parent)) != id(
                     target.parent
                 ):
                     position = self._find_position(target)
-                    self.ops.append(Move(source, source_parent, position))
+                    move = Move(source, source_parent, position)
+                    move.apply()
+                    self.ops.append(move)
 
             self.in_order.update((id(source), id(target)))
             self._align_children(source, target)
 
         for source in post_order_walk(context.source_root):
-            if not context.partner(id(source)):
-                self.ops.append(Delete(source))
+            if id(source) not in self.context.matching_set.source_target_map:
+                delete = Delete(source)
+                delete.apply()
+                self.ops.append(delete)
 
         return EditScript(self.ops)
 
@@ -93,21 +103,26 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             if self.context.matching_set.target_source_map.get(x) in source_children
         ]
 
-        longest_common_subsequence = self.longest_common_subsequence(
-            matched_source_children, matched_target_children
+        longest_common_subseq = set(
+            longest_common_subsequence(
+                matched_source_children,
+                matched_target_children,
+                lambda s, t: self.context.partner(s) is t,
+            )
         )
 
-        for match in longest_common_subsequence:
+        for match in longest_common_subseq:
             self.in_order.update((match.source, match.target))
 
         for source_child, target_child in product(
             matched_target_children, matched_source_children
         ):
             if (
-                self.context.matching_set.source_target_map.get(id(source_child))
-                == id(target_child)
+                # self.context.matching_set.source_target_map.get(id(source_child))
+                # == id(target_child)
+                self.context.partner(source_child) is target_child
                 and MatchingPair(id(source_child), id(target_child))
-                in longest_common_subsequence
+                in longest_common_subseq
             ):
                 position = self._find_position(target_child)
                 self.ops.append(Move(source_child, source, position))
@@ -115,7 +130,6 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
 
     def _find_position(self, target: Node):
         in_order_siblings = [x for x in target.siblings if id(x) in self.in_order]
-
         if not in_order_siblings or target is first(in_order_siblings, None):
             return 0
 
@@ -128,8 +142,43 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         source = self.context.partner(rightmost)
         return 0 if source is None else source.position + 1
 
-    def longest_common_subsequence(
-        self, source_nodes: Sequence[Node], target_nodes: Sequence[Node]
-    ) -> Set[MatchingPair]:
-        # TODO
-        return set()
+
+def longest_common_subsequence(
+    source_nodes: Sequence[Node],
+    target_nodes: Sequence[Node],
+    equals_fn: Callable[[Node, Node], bool],
+):
+    # Calculate length
+    cache = defaultdict(lambda: defaultdict(int))
+
+    for s, t in product(
+        reversed(range(len(source_nodes))),
+        reversed(range(len(target_nodes))),
+    ):
+        if equals_fn(source_nodes[s], target_nodes[t]):
+            cache[s][t] = cache[s + 1][t + 1] + 1
+
+        elif cache[s + 1][t] >= cache[s][t + 1]:
+            cache[s][t] = cache[s + 1][t]
+
+        else:
+            cache[s][t] = cache[s][t + 1]
+
+    # Collect the result
+    s = peekable(range(len(source_nodes)))
+    t = peekable(range(len(target_nodes)))
+
+    while s and t:
+        source_node = source_nodes[s.peek()]
+        target_node = target_nodes[t.peek()]
+
+        if equals_fn(source_node, target_node):
+            next(s)
+            next(t)
+            yield MatchingPair(id(source_node), id(target_node))
+
+        elif cache[s.peek() + 1][t.peek()] >= cache[s.peek()][t.peek() + 1]:
+            next(s)
+
+        else:
+            next(t)

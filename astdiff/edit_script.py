@@ -2,9 +2,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Tuple
 
+import typic
+
 from astdiff.ast import Node
 
 
+@typic.al(strict=True)
 @dataclass(frozen=True)
 class Operation(ABC):
     node: Node
@@ -14,6 +17,7 @@ class Operation(ABC):
         ...
 
 
+@typic.al(strict=True)
 @dataclass(frozen=True)
 class Insert(Operation):
     parent: Node
@@ -26,6 +30,7 @@ class Insert(Operation):
         self.node.parent = self.parent
 
 
+@typic.al(strict=True)
 @dataclass(frozen=True)
 class Move(Insert):
     def apply(self):
@@ -33,21 +38,21 @@ class Move(Insert):
         super().apply()
 
 
+@typic.al(strict=True)
 @dataclass(frozen=True)
 class Delete(Operation):
     def apply(self):
         self.node.siblings = tuple(x for x in self.node.siblings if x is not self.node)
 
 
+@typic.al(strict=True)
 @dataclass(frozen=True)
 class Update(Operation):
     value: str
 
     def apply(self):
-        self.source.value = self.value
+        self.node.value = self.value
 
 
 class EditScript(Tuple[Operation, ...]):
-    def apply(self):
-        for op in self:
-            op.apply()
+    ...
