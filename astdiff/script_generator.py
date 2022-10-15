@@ -119,9 +119,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             matched_target_children, matched_source_children
         ):
             if (
-                self.context.matching_set.source_target_map.get(id(source_child))
-                == id(target_child)
-                # self.context.partner(source_child) is target_child
+                self.context.partner(source_child) is target_child
                 and MatchingPair(id(source_child), id(target_child))
                 in longest_common_subseq
             ):
