@@ -125,7 +125,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             ):
                 position = self._find_position(target_child)
                 self.ops.append(Move(source_child, source, position))
-                self.in_order.update((id(source_child, id(target_child))))
+                self.in_order.update((id(source_child), id(target_child)))
 
     def _find_position(self, target: Node):
         in_order_siblings = [x for x in target.siblings if id(x) in self.in_order]
