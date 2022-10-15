@@ -111,7 +111,7 @@ class GumTreeMatcher(Matcher):
 
         # Mappings with more descendants are considered first.
         candidate_mappings.sort(key=lambda x: x.max_size(self.context), reverse=True)
-
+        # When multiple mappings are possible, break tie using dice coefficient.
         dice_fn = partial(self._dice_coefficient, compare_parents=True)
 
         for mapping in candidate_mappings:
