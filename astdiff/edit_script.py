@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Tuple
 
 import typic
@@ -16,6 +16,9 @@ class Operation(ABC):
     def apply(self):
         ...
 
+    def standalone(self):
+        return replace(self, node=self.node.standalone())
+
 
 @typic.al(strict=True)
 @dataclass(frozen=True)
@@ -28,6 +31,13 @@ class Insert(Operation):
         children.insert(self.position, self.node)
         self.parent.children = tuple(children)
         self.node.parent = self.parent
+
+    def standalone(self):
+        return replace(
+            super().standalone(),
+            parent=self.parent.standalone(),
+            position=self.position,
+        )
 
 
 @typic.al(strict=True)
@@ -53,6 +63,10 @@ class Update(Operation):
     def apply(self):
         self.node.value = self.value
 
+    def standalone(self):
+        return replace(super().standalone(), value=self.value)
+
 
 class EditScript(Tuple[Operation, ...]):
-    ...
+    def standalone(self):
+        return EditScript(op.standalone() for op in self)

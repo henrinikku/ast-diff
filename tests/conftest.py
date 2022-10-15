@@ -9,7 +9,7 @@ from astdiff.script_generator import WithMoveEditScriptGenerator
 from astdiff.traversal import pre_order_walk
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def parser():
     return ParsoParser(
         options=ParseOptions(
@@ -19,17 +19,17 @@ def parser():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def matcher():
     return GumTreeMatcher()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def generator():
     return WithMoveEditScriptGenerator()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def source():
     """
     For visualization of the tree below, see figure 1 in page 4 of
@@ -66,13 +66,13 @@ def source():
         label="MethodDeclaration",
         value="",
         children=(
-            Node(label="Modifier", value="public", children=()),
+            # Node(label="Modifier", value="public", children=()),
             Node(
                 label="SimpleType",
                 value="String",
                 children=(Node(label="SimpleName", value="String", children=()),),
             ),
-            Node(label="SimpleName", value="foo", children=()),
+            # Node(label="SimpleName", value="foo", children=()),
             Node(
                 label="SingleVariableDeclaration",
                 value="",
@@ -96,8 +96,8 @@ def source():
                 label="TypeDeclaration",
                 value="",
                 children=(
-                    Node(label="Modifier", value="public", children=()),
-                    Node(label="SimpleName", value="Test", children=()),
+                    # Node(label="Modifier", value="public", children=()),
+                    # Node(label="SimpleName", value="Test", children=()),
                     source_method_declaration,
                 ),
             ),
@@ -110,7 +110,7 @@ def source():
     return source
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def target():
     """
     For visualization of the tree below, see figure 1 in page 4 of
@@ -188,13 +188,13 @@ def target():
         label="MethodDeclaration",
         value="",
         children=(
-            Node(label="Modifier", value="private", children=()),
+            # Node(label="Modifier", value="private", children=()),
             Node(
                 label="SimpleType",
                 value="String",
                 children=(Node(label="SimpleName", value="String", children=()),),
             ),
-            Node(label="SimpleName", value="foo", children=()),
+            # Node(label="SimpleName", value="foo", children=()),
             Node(
                 label="SingleVariableDeclaration",
                 value="",
@@ -214,8 +214,8 @@ def target():
                 label="TypeDeclaration",
                 value="",
                 children=(
-                    Node(label="Modifier", value="public", children=()),
-                    Node(label="SimpleName", value="Test", children=()),
+                    # Node(label="Modifier", value="public", children=()),
+                    # Node(label="SimpleName", value="Test", children=()),
                     target_method_declaration,
                 ),
             ),
@@ -228,7 +228,7 @@ def target():
     return target
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def post_matching_context(matcher: GumTreeMatcher, source: Node, target: Node):
     context = DiffContext(
         source_nodes={id(x): x for x in pre_order_walk(source)},
