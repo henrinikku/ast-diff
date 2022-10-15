@@ -33,7 +33,7 @@ def test_anchor_matching_performance(
     def match_anchors():
         return matcher.match_anchors(source, target)
 
-    benchmark.pedantic(match_anchors, setup=setup)
+    benchmark.pedantic(match_anchors, rounds=100, setup=setup)
 
 
 def test_container_matching_performance(
@@ -50,7 +50,7 @@ def test_container_matching_performance(
     def match_containers():
         return matcher.match_containers(source, target)
 
-    benchmark.pedantic(match_containers, setup=setup)
+    benchmark.pedantic(match_containers, rounds=100, setup=setup)
 
 
 def test_anchor_matching(matcher: GumTreeMatcher, source: Node, target: Node):

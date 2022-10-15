@@ -20,6 +20,16 @@ def parser():
 
 
 @pytest.fixture(scope="function")
+def no_metadata_parser():
+    return ParsoParser(
+        options=ParseOptions(
+            add_metadata=False,
+            add_parent=False,
+        )
+    )
+
+
+@pytest.fixture(scope="function")
 def matcher():
     return GumTreeMatcher()
 
