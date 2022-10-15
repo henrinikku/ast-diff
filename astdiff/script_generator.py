@@ -51,7 +51,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             # The partner of target's parent, i.e., a source node.
             source_parent = target.parent and context.partner(target.parent)
 
-            if not source:
+            if source is None:
                 position = self._find_position(target)
                 source = Node(target.label, target.value)
                 insert = Insert(source, source_parent, position)
@@ -82,6 +82,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
                 delete = Delete(source)
                 delete.apply()
                 self.ops.append(delete)
+                context.remove_source(source)
 
         return EditScript(self.ops)
 
@@ -118,9 +119,9 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             matched_target_children, matched_source_children
         ):
             if (
-                # self.context.matching_set.source_target_map.get(id(source_child))
-                # == id(target_child)
-                self.context.partner(source_child) is target_child
+                self.context.matching_set.source_target_map.get(id(source_child))
+                == id(target_child)
+                # self.context.partner(source_child) is target_child
                 and MatchingPair(id(source_child), id(target_child))
                 in longest_common_subseq
             ):

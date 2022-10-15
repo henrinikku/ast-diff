@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
+from functools import partial
 from itertools import product
 from math import inf
 from typing import Dict, List, Set
@@ -49,7 +50,7 @@ class GumTreeMatcher(Matcher):
 
     def prepare(self, context: DiffContext):
         self.context = context
-        self.matching_set = MatchingSet()
+        self.matching_set = self.context.matching_set = MatchingSet()
 
     def match_anchors(self, source_root: Node, target_root: Node):
         """
@@ -111,13 +112,15 @@ class GumTreeMatcher(Matcher):
         # Mappings with more descendants are considered first.
         candidate_mappings.sort(key=lambda x: x.max_size(self.context), reverse=True)
 
+        dice_fn = partial(self._dice_coefficient, compare_parents=True)
+
         for mapping in candidate_mappings:
             candidate_matches = sorted(
                 (
                     MatchingPair(s, t)
                     for s, t in product(mapping.source_ids, mapping.target_ids)
                 ),
-                key=self._dice_coefficient,
+                key=dice_fn,
                 reverse=True,
             )
 
@@ -134,7 +137,7 @@ class GumTreeMatcher(Matcher):
             if source_node.is_root:
                 self.matching_set.add(MatchingPair(id(source_root), id(target_root)))
 
-            else:
+            elif source_node.children and self.context.partner(source_node) is None:
                 candidate_matches = self._find_candidate_container_matches(source_node)
                 weighted_candidate_matches = (
                     (self._dice_coefficient(x), x) for x in candidate_matches
@@ -152,27 +155,25 @@ class GumTreeMatcher(Matcher):
 
         return self.matching_set
 
-    def _find_candidate_container_matches(self, source_node: Node):
+    def _find_candidate_container_matches(self, source_tree: Node):
         """
         Yields target nodes matched with descendants of given source node.
         """
         seen = set()
-        for source_descendant in descendants(source_node):
-            target_id = self.matching_set.source_target_map.get(id(source_descendant))
-            if target_id is None:
+        for source in descendants(source_tree):
+            target = self.context.partner(source)
+            if target is None:
                 continue
 
-            target_node = self.context.target_nodes[target_id]
-            while target_node.parent:
-                target_node = target_node.parent
-                if id(target_node) in seen:
+            while target.parent:
+                target = target.parent
+                if id(target) in seen:
                     break
 
-                target_matched = id(target_node) in self.matching_set.target_source_map
-                if not target_matched and source_node.can_match(target_node):
-                    yield MatchingPair(id(source_node), id(target_node))
+                if not self.context.partner(target) and source_tree.can_match(target):
+                    yield MatchingPair(id(source_tree), id(target))
 
-                seen.add(id(target_node))
+                seen.add(id(target))
 
     def _descendant_matches(self, match: MatchingPair):
         source = self.context.source_nodes[match.source]
@@ -187,15 +188,16 @@ class GumTreeMatcher(Matcher):
             child_match = MatchingPair(id(source_child), id(target_child))
             yield from self._descendant_matches(child_match)
 
-    def _dice_coefficient(self, match: MatchingPair):
+    def _dice_coefficient(self, match: MatchingPair, compare_parents: bool = False):
         """
         Measures the ratio of common descendants between two nodes.
         """
         source_node = self.context.source_nodes[match.source]
         target_node = self.context.target_nodes[match.target]
 
-        source_node = source_node.parent or source_node
-        target_node = target_node.parent or target_node
+        if compare_parents:
+            source_node = source_node.parent or source_node
+            target_node = target_node.parent or target_node
 
         source_descendants = set(id(x) for x in descendants(source_node))
         target_descendants = set(id(x) for x in descendants(target_node))
@@ -205,8 +207,10 @@ class GumTreeMatcher(Matcher):
             for x in source_descendants
         )
 
-        return (2 * common_descendant_matches) / (
-            len(source_descendants) + len(target_descendants)
+        return (
+            2
+            * common_descendant_matches
+            / (len(source_descendants) + len(target_descendants))
         )
 
 

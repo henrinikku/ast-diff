@@ -23,7 +23,7 @@ class Node:
     value: str
     children: Tuple["Node", ...] = field(default_factory=tuple, repr=False)
     parent: Optional["Node"] = field(default=None, repr=False, compare=False)
-    metadata: Optional[NodeMetadata] = field(default=None, repr=False)
+    metadata: Optional[NodeMetadata] = field(default=None, repr=False, compare=False)
 
     @property
     def is_leaf(self):
@@ -52,7 +52,7 @@ class Node:
         return replace(self, children=(), parent=None, metadata=None)
 
     def can_match(self, other: "Node"):
-        return (self.label, self.is_root) == (other.label, other.is_root)
+        return self.label == other.label
 
     def isomorphic_to(self, other: "Node"):
         """

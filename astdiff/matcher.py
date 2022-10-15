@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class Matcher(ABC):
     """
-    Base class for all node matching implementations
+    Base class for all node matching implementations.
     """
 
     @abstractmethod
