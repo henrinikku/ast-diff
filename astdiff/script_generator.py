@@ -66,9 +66,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
                     update.apply()
                     self.ops.append(update)
 
-                if context.matching_set.source_target_map.get(id(source.parent)) != id(
-                    target.parent
-                ):
+                if context.partner(source.parent) is not target.parent:
                     position = self._find_position(target)
                     move = Move(source, source_parent, position)
                     move.apply()
@@ -115,16 +113,18 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         for match in longest_common_subseq:
             self.in_order.update((match.source, match.target))
 
-        for source_child, target_child in product(
+        for target_child, source_child in product(
             matched_target_children, matched_source_children
         ):
             if (
                 self.context.partner(source_child) is target_child
                 and MatchingPair(id(source_child), id(target_child))
-                in longest_common_subseq
+                not in longest_common_subseq
             ):
                 position = self._find_position(target_child)
-                self.ops.append(Move(source_child, source, position))
+                move = Move(source_child, source, position)
+                move.apply()
+                self.ops.append(move)
                 self.in_order.update((id(source_child), id(target_child)))
 
     def _find_position(self, target: Node):
