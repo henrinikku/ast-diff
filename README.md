@@ -32,6 +32,10 @@
 
 - [Viikkoraportti 5](docs/viikko5.md)
 
+### Viikko 6
+
+- [Viikkoraportti 6](docs/viikko6.md)
+
 ## Käyttöohjeet
 
 Kaikki komennot suoritetaan projektin juurikansiossa.
