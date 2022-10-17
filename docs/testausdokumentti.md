@@ -18,10 +18,10 @@ poetry run pytest
 
 ### Suorituskykytestit
 
-Suorituskykytestejä ei ajeta oletuksena, sillä niissä menee muita testejä huomattavasti enemmän aikaa. Suorituskykytestit saa mukaan suoritukseen ajamalla projektin juurikansiossa:
+Suorituskykytestejä ei ajeta oletuksena, sillä niissä menee muita testejä huomattavasti enemmän aikaa. Suorituskykytestit saa suoritettua seuraavalla komennolla:
 
 ```
-poetry run pytest --benchmark-enable
+poetry run pytest --benchmark-only
 ```
 
 Suorituskykytestien ajamiseen menee tällä hetkellä noin minuutti ja ne tulostavat seuraavanlaisen raportin:
