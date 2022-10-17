@@ -33,11 +33,7 @@ class Insert(Operation):
         self.node.parent = self.parent
 
     def standalone(self):
-        return replace(
-            super().standalone(),
-            parent=self.parent.standalone(),
-            position=self.position,
-        )
+        return replace(super().standalone(), parent=self.parent.standalone())
 
 
 @typic.al(strict=True)
@@ -62,9 +58,6 @@ class Update(Operation):
 
     def apply(self):
         self.node.value = self.value
-
-    def standalone(self):
-        return replace(super().standalone(), value=self.value)
 
 
 class EditScript(Tuple[Operation, ...]):

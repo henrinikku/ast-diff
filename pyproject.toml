@@ -28,7 +28,7 @@ pydot = "^1.4.2"
 matplotlib = "^3.6.1"
 
 [tool.pytest.ini_options]
-addopts = "--benchmark-disable"
+addopts = "--benchmark-skip"
 
 [tool.black]
 extend-exclude = "tests/data"
