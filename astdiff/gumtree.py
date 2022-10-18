@@ -11,8 +11,8 @@ from more_itertools import first
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
 from astdiff.matcher import Matcher
-from astdiff.queue import HeightIndexedPriorityQueue
 from astdiff.traversal import descendants, post_order_walk
+from astdiff.util import HeightIndexedPriorityQueue
 
 logger = logging.getLogger(__name__)
 

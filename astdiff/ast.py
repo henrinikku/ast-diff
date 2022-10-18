@@ -13,7 +13,6 @@ class NodeMetadata:
 
     height: int
     size: int
-    position: int = 0
 
 
 @total_ordering
@@ -48,6 +47,11 @@ class Node:
         if self.parent:
             self.parent.children = value
 
+    @property
+    def compare_fields(self):
+        hashcode = (self.metadata and (self.metadata.hashcode,)) or tuple()
+        return (self.label, self.value, len(self.children)) + hashcode
+
     def standalone(self):
         return replace(self, children=(), parent=None, metadata=None)
 
@@ -65,8 +69,4 @@ class Node:
         )
 
     def __lt__(self, other: "Node"):
-        return (self.label, self.value, len(self.children)) < (
-            other.label,
-            other.value,
-            len(other.children),
-        )
+        return self.compare_fields < other.compare_fields

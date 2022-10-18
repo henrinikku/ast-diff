@@ -1,15 +1,14 @@
 import logging
 from abc import ABC, abstractmethod
-from collections import defaultdict
-from itertools import product
-from typing import Callable, List, Sequence, Set
+from typing import List, Set
 
-from more_itertools import first, peekable
+from more_itertools import first
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, NodeId
 from astdiff.edit_script import Delete, EditScript, Insert, Move, Operation, Update
 from astdiff.traversal import bfs, post_order_walk
+from astdiff.util import longest_common_subsequence
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +102,8 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         ]
 
         longest_common_subseq = set(
-            longest_common_subsequence(
+            MatchingPair(id(s), id(t))
+            for s, t in longest_common_subsequence(
                 matched_source_children,
                 matched_target_children,
                 lambda s, t: self.context.partner(s) is t,
@@ -141,44 +141,3 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
 
         source = self.context.partner(rightmost)
         return 0 if source is None else source.position + 1
-
-
-def longest_common_subsequence(
-    source_nodes: Sequence[Node],
-    target_nodes: Sequence[Node],
-    equals_fn: Callable[[Node, Node], bool],
-):
-    # Calculate length
-    cache = defaultdict(lambda: defaultdict(int))
-
-    for s, t in product(
-        reversed(range(len(source_nodes))),
-        reversed(range(len(target_nodes))),
-    ):
-        if equals_fn(source_nodes[s], target_nodes[t]):
-            cache[s][t] = cache[s + 1][t + 1] + 1
-
-        elif cache[s + 1][t] >= cache[s][t + 1]:
-            cache[s][t] = cache[s + 1][t]
-
-        else:
-            cache[s][t] = cache[s][t + 1]
-
-    # Collect the result
-    s = peekable(range(len(source_nodes)))
-    t = peekable(range(len(target_nodes)))
-
-    while s and t:
-        source_node = source_nodes[s.peek()]
-        target_node = target_nodes[t.peek()]
-
-        if equals_fn(source_node, target_node):
-            next(s)
-            next(t)
-            yield MatchingPair(id(source_node), id(target_node))
-
-        elif cache[s.peek() + 1][t.peek()] >= cache[s.peek()][t.peek() + 1]:
-            next(s)
-
-        else:
-            next(t)
