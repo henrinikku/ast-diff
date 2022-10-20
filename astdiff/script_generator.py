@@ -1,5 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
+from itertools import product
 from typing import List, Set
 
 from more_itertools import first
@@ -84,11 +85,11 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         return EditScript(self.ops)
 
     def _align_children(self, source: Node, target: Node):
-        source_children = set(map(id, source.children))
-        target_children = set(map(id, target.children))
+        source_children = list(map(id, source.children))
+        target_children = list(map(id, target.children))
 
-        self.in_order -= source_children
-        self.in_order -= target_children
+        self.in_order -= set(source_children)
+        self.in_order -= set(target_children)
 
         matched_source_children = [
             self.context.source_nodes[x]
@@ -101,32 +102,32 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             if self.context.matching_set.target_source_map.get(x) in source_children
         ]
 
-        longest_common_subseq = set(
-            MatchingPair(id(s), id(t))
+        # Use dict to preserve order for easier debugging.
+        longest_common_subseq = dict.fromkeys(
+            (id(s), id(t))
             for s, t in longest_common_subsequence(
                 matched_source_children,
                 matched_target_children,
-                lambda s, t: self.context.partner(s) is t,
+                lambda a, b: self.context.partner(a) is b,
             )
         )
 
-        for match in longest_common_subseq:
-            self.in_order.update((match.source, match.target))
+        # Mark each node in the lcs as "in order".
+        self.in_order.update(*longest_common_subseq)
 
-        # FIXME: Causes random test failures
-        # for target_child, source_child in product(
-        #     matched_target_children, matched_source_children
-        # ):
-        #     if (
-        #         self.context.partner(source_child) is target_child
-        #         and MatchingPair(id(source_child), id(target_child))
-        #         not in longest_common_subseq
-        #     ):
-        #         position = self._find_position(target_child)
-        #         move = Move(source_child, source, position)
-        #         move.apply()
-        #         self.ops.append(move)
-        #         self.in_order.update((id(source_child), id(target_child)))
+        for target_child, source_child in product(
+            matched_target_children, matched_source_children
+        ):
+            child_pair = id(source_child), id(target_child)
+            if (
+                self.context.partner(source_child) is target_child
+                and child_pair not in longest_common_subseq
+            ):
+                Delete(source_child).apply()
+                position = self._find_position(target_child)
+                Insert(source_child, source, position).apply()
+                self.ops.append(Move(source_child, source, position))
+                self.in_order.update(child_pair)
 
     def _find_position(self, target: Node):
         in_order_siblings = [x for x in target.siblings if id(x) in self.in_order]

@@ -37,13 +37,10 @@ def longest_common_subsequence(
     t = peekable(range(len(target)))
 
     while s and t:
-        source_node = source[s.peek()]
-        target_node = target[t.peek()]
-
-        if equals_fn(source_node, target_node):
+        if equals_fn(source[s.peek()], target[t.peek()]):
+            yield source[s.peek()], target[t.peek()]
             next(s)
             next(t)
-            yield source_node, target_node
 
         elif cache[s.peek() + 1][t.peek()] >= cache[s.peek()][t.peek() + 1]:
             next(s)

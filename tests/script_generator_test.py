@@ -9,8 +9,6 @@ def test_edit_scrit_generation(
     post_matching_context: DiffContext,
 ):
     edit_script = generator.generate_edit_script(post_matching_context)
-    for op in edit_script:
-        print(op)
 
     # For now, edit operations are always applied to the source tree.
     assert post_matching_context.source_root == post_matching_context.target_root
