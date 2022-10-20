@@ -2,6 +2,14 @@ from astdiff.ast import Node, NodeMetadata
 from astdiff.util import HeightIndexedPriorityQueue, longest_common_subsequence
 
 
+def test_longest_common_subsequence_empty_source():
+    assert list(longest_common_subsequence("", "12345")) == []
+
+
+def test_longest_common_subsequence_empty_input():
+    assert list(longest_common_subsequence("", "")) == []
+
+
 def test_longest_common_subsequence_short_equal_strings():
     source = target = "12345"
     assert list(longest_common_subsequence(source, target)) == list(zip(source, target))
@@ -36,6 +44,12 @@ def test_longest_common_subsequence_non_continuous_match():
 def test_longest_common_subsequence_continuous_match_at_start():
     source = "saippuakauppias"
     target = "saippua"
+    assert list(longest_common_subsequence(source, target)) == list(zip(target, target))
+
+
+def test_longest_common_subsequence_continuous_match_at_end():
+    source = "saippuakauppias"
+    target = "kauppias"
     assert list(longest_common_subsequence(source, target)) == list(zip(target, target))
 
 
