@@ -119,6 +119,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             matched_target_children, matched_source_children
         ):
             child_pair = id(source_child), id(target_child)
+            # Realign all matches that are not part of the lcs.
             if (
                 self.context.partner(source_child) is target_child
                 and child_pair not in longest_common_subseq
@@ -130,7 +131,12 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
                 self.in_order.update(child_pair)
 
     def _find_position(self, target: Node):
-        in_order_siblings = [x for x in target.siblings if id(x) in self.in_order]
+        in_order_siblings = [
+            target_sibling
+            for target_sibling in target.siblings
+            if id(target_sibling) in self.in_order
+        ]
+
         if not in_order_siblings or target is first(in_order_siblings, None):
             return 0
 
