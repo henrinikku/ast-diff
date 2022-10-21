@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, replace
-from typing import Tuple
+from dataclasses import dataclass, field, replace
+from typing import Optional, Tuple
 
 import typic
 
@@ -55,9 +55,16 @@ class Delete(Operation):
 @dataclass(frozen=True)
 class Update(Operation):
     value: str
+    old_value: Optional[str] = field(default=None, repr=False, compare=False)
 
     def apply(self):
         self.node.value = self.value
+
+    def standalone(self):
+        return replace(
+            self,
+            node=replace(self.node.standalone(), value=self.old_value or self.value),
+        )
 
 
 class EditScript(Tuple[Operation, ...]):

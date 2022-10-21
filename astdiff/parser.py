@@ -8,7 +8,7 @@ import parso
 from parso.python.tree import EndMarker, Newline, Operator
 from parso.tree import NodeOrLeaf as ParsoNode
 
-from astdiff.ast import Node
+from astdiff.ast import Node, NodePosition
 from astdiff.metadata import add_parents, attach_metadata
 
 
@@ -104,12 +104,13 @@ class ParsoParser(Parser[ParsoNode]):
     def canonicalize(self, node: ParsoNode):
         label = node.type
         value = getattr(node, "value", "")
+        position = NodePosition(*node.start_pos, *node.end_pos)
         children = tuple(
             self.canonicalize(x)
             for x in self._iter_child_nodes(node)
             if not self._redundant(x)
         )
-        return Node(label, value, children=children)
+        return Node(label, value, position=position, children=children)
 
     @classmethod
     def _iter_child_nodes(cls, node: ParsoNode):

@@ -57,7 +57,6 @@ def _calculate_hash(node: Node):
 
 
 def _hash_node(node: Node, mid_hash: int, exponent: int):
-    # TODO: Consider ignoring node.value in order to better detect updates.
     return sum(
         (
             hash((node.label, node.value, _HASH_START)),

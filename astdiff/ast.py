@@ -15,6 +15,14 @@ class NodeMetadata:
     size: int
 
 
+@dataclass(frozen=True)
+class NodePosition:
+    start_line: int
+    start_col: int
+    end_line: int
+    end_col: int
+
+
 @total_ordering
 @dataclass
 class Node:
@@ -23,6 +31,7 @@ class Node:
     children: Tuple["Node", ...] = field(default_factory=tuple, repr=False)
     parent: Optional["Node"] = field(default=None, repr=False, compare=False)
     metadata: Optional[NodeMetadata] = field(default=None, repr=False, compare=False)
+    position: Optional[NodePosition] = field(default=None, repr=False, compare=False)
 
     @property
     def is_leaf(self):
@@ -33,7 +42,7 @@ class Node:
         return self.parent is None
 
     @property
-    def position(self):
+    def position_in_siblings(self):
         return next(
             (i for i, sibling in enumerate(self.siblings) if self is sibling), None
         )
@@ -66,6 +75,21 @@ class Node:
             self.metadata
             and other.metadata
             and self.metadata.hashcode == other.metadata.hashcode
+        )
+
+    def isomorphic_to_without_values(self, other: "Node"):
+        """
+        Checks if self is isomporphic to given tree when node values are ignored.
+        """
+        return (
+            self
+            and other
+            and self.can_match(other)
+            and len(self.children) == len(other.children)
+            and all(
+                a.isomorphic_to_without_values(b)
+                for a, b in zip(self.children, other.children)
+            )
         )
 
     def __lt__(self, other: "Node"):

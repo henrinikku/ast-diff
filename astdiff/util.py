@@ -1,14 +1,25 @@
 import heapq
 import operator
 from collections import defaultdict
+from functools import reduce
 from itertools import product
-from typing import Callable, List, Sequence, Tuple, TypeVar
+from typing import Callable, DefaultDict, Iterable, List, Sequence, Tuple, TypeVar
 
 from more_itertools import peekable
 
 from astdiff.ast import Node
 
 T = TypeVar("T")
+K = TypeVar("K")
+
+
+def group_by(items: Iterable[T], key_fn: Callable[[T], K]):
+    initial: DefaultDict[K, T] = defaultdict(list)
+    return reduce(
+        lambda res, item: res[key_fn(item)].append(item) or res,
+        items,
+        initial,
+    )
 
 
 def longest_common_subsequence(

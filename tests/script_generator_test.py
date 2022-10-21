@@ -1,6 +1,6 @@
 from astdiff.ast import Node
 from astdiff.context import DiffContext
-from astdiff.edit_script import Insert, Move
+from astdiff.edit_script import Insert, Move, Update
 from astdiff.script_generator import WithMoveEditScriptGenerator
 
 
@@ -14,6 +14,7 @@ def test_edit_scrit_generation(
     assert post_matching_context.source_root == post_matching_context.target_root
 
     assert edit_script.standalone() == (
+        Update(node=Node(label="Modifier", value="public"), value="private"),
         Insert(
             node=Node(label="ReturnStatement", value=""),
             parent=Node(label="IfStatement", value=""),

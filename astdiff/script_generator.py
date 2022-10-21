@@ -62,7 +62,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
 
             elif not target.is_root:
                 if source.value != target.value:
-                    update = Update(source, target)
+                    update = Update(source, target.value, source.value)
                     update.apply()
                     self.ops.append(update)
 
@@ -147,4 +147,4 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             rightmost = sibling
 
         source = self.context.partner(rightmost)
-        return 0 if source is None else source.position + 1
+        return 0 if source is None else source.position_in_siblings + 1

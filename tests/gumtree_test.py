@@ -87,14 +87,6 @@ def test_anchor_matching(matcher: GumTreeMatcher, source: Node, target: Node):
 
 
 def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node):
-    expected = [
-        (("IfStatement", ""), ("IfStatement", "")),
-        (("Block", ""), ("Block", "")),
-        (("MethodDeclaration", ""), ("MethodDeclaration", "")),
-        (("TypeDeclaration", ""), ("TypeDeclaration", "")),
-        (("CompilationUnit", ""), ("CompilationUnit", "")),
-    ]
-
     context = DiffContext(
         source_nodes={id(x): x for x in pre_order_walk(source)},
         target_nodes={id(x): x for x in pre_order_walk(target)},
@@ -110,7 +102,17 @@ def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node)
         context,
     )
     matched_containers = matched_nodes[len(matched_anchors) :]
-    assert matched_containers == expected
+    assert matched_containers == [
+        (("IfStatement", ""), ("IfStatement", "")),
+        (("Block", ""), ("Block", "")),
+        (("SimpleName", "foo"), ("SimpleName", "foo")),
+        (("Modifier", "public"), ("Modifier", "private")),
+        (("MethodDeclaration", ""), ("MethodDeclaration", "")),
+        (("Modifier", "public"), ("Modifier", "public")),
+        (("SimpleName", "Test"), ("SimpleName", "Test")),
+        (("TypeDeclaration", ""), ("TypeDeclaration", "")),
+        (("CompilationUnit", ""), ("CompilationUnit", "")),
+    ]
 
     flipped_context = DiffContext(
         source_nodes={id(x): x for x in pre_order_walk(target)},
@@ -127,4 +129,14 @@ def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node)
         flipped_context,
     )
     matched_containers = matched_nodes[len(matched_anchors) :]
-    assert matched_containers == expected
+    assert matched_containers == [
+        (("IfStatement", ""), ("IfStatement", "")),
+        (("Block", ""), ("Block", "")),
+        (("SimpleName", "foo"), ("SimpleName", "foo")),
+        (("Modifier", "private"), ("Modifier", "public")),
+        (("MethodDeclaration", ""), ("MethodDeclaration", "")),
+        (("Modifier", "public"), ("Modifier", "public")),
+        (("SimpleName", "Test"), ("SimpleName", "Test")),
+        (("TypeDeclaration", ""), ("TypeDeclaration", "")),
+        (("CompilationUnit", ""), ("CompilationUnit", "")),
+    ]

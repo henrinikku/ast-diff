@@ -76,13 +76,13 @@ def source():
         label="MethodDeclaration",
         value="",
         children=(
-            # Node(label="Modifier", value="public", children=()),
+            Node(label="Modifier", value="public", children=()),
             Node(
                 label="SimpleType",
                 value="String",
                 children=(Node(label="SimpleName", value="String", children=()),),
             ),
-            # Node(label="SimpleName", value="foo", children=()),
+            Node(label="SimpleName", value="foo", children=()),
             Node(
                 label="SingleVariableDeclaration",
                 value="",
@@ -106,8 +106,8 @@ def source():
                 label="TypeDeclaration",
                 value="",
                 children=(
-                    # Node(label="Modifier", value="public", children=()),
-                    # Node(label="SimpleName", value="Test", children=()),
+                    Node(label="Modifier", value="public", children=()),
+                    Node(label="SimpleName", value="Test", children=()),
                     source_method_declaration,
                 ),
             ),
@@ -198,13 +198,13 @@ def target():
         label="MethodDeclaration",
         value="",
         children=(
-            # Node(label="Modifier", value="private", children=()),
+            Node(label="Modifier", value="private", children=()),
             Node(
                 label="SimpleType",
                 value="String",
                 children=(Node(label="SimpleName", value="String", children=()),),
             ),
-            # Node(label="SimpleName", value="foo", children=()),
+            Node(label="SimpleName", value="foo", children=()),
             Node(
                 label="SingleVariableDeclaration",
                 value="",
@@ -224,8 +224,8 @@ def target():
                 label="TypeDeclaration",
                 value="",
                 children=(
-                    # Node(label="Modifier", value="public", children=()),
-                    # Node(label="SimpleName", value="Test", children=()),
+                    Node(label="Modifier", value="public", children=()),
+                    Node(label="SimpleName", value="Test", children=()),
                     target_method_declaration,
                 ),
             ),

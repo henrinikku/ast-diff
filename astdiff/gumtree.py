@@ -4,15 +4,19 @@ from dataclasses import dataclass, field
 from functools import partial
 from itertools import product
 from math import inf
-from typing import Dict, List, Set
+from typing import Callable, Dict, List, Set
 
 from more_itertools import first
 
 from astdiff.ast import Node
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
 from astdiff.matcher import Matcher
-from astdiff.traversal import descendants, post_order_walk
-from astdiff.util import HeightIndexedPriorityQueue
+from astdiff.traversal import descendants, post_order_walk, pre_order_walk
+from astdiff.util import (
+    HeightIndexedPriorityQueue,
+    group_by,
+    longest_common_subsequence,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +139,9 @@ class GumTreeMatcher(Matcher):
 
         for source_node in post_order_walk(source_root):
             if source_node.is_root:
-                self.matching_set.add(MatchingPair(id(source_root), id(target_root)))
+                match = MatchingPair(id(source_root), id(target_root))
+                self._attempt_recovery_matching(match)
+                self.matching_set.add(match)
 
             elif source_node.children and self.context.partner(source_node) is None:
                 candidate_matches = self._find_candidate_container_matches(source_node)
@@ -145,8 +151,8 @@ class GumTreeMatcher(Matcher):
 
                 dice, match = max(weighted_candidate_matches, default=(-inf, None))
                 if dice >= self.min_dice:
+                    self._attempt_recovery_matching(match)
                     self.matching_set.add(match)
-                    # TODO: Look for recovery mappings based on min edit distance.
 
         matches_after = len(self.matching_set)
         logger.debug(
@@ -154,6 +160,71 @@ class GumTreeMatcher(Matcher):
         )
 
         return self.matching_set
+
+    def _attempt_recovery_matching(self, match: MatchingPair):
+        logger.debug("Finding recovery matches...")
+
+        source = self.context.source_nodes[match.source]
+        target = self.context.target_nodes[match.target]
+
+        if max(source.metadata.size, target.metadata.size) >= self.max_size:
+            logger.debug(
+                "Subtrees have size larger than %s, skipping recovery matching...",
+                self.max_size,
+            )
+            return
+
+        self._attempt_longest_common_subsequence_matching(
+            source, target, lambda a, b: a.isomorphic_to(b)
+        )
+        self._attempt_longest_common_subsequence_matching(
+            source, target, lambda a, b: a.isomorphic_to_without_values(b)
+        )
+
+        self._attempt_histogram_matching(source, target)
+
+    def _attempt_longest_common_subsequence_matching(
+        self, source: Node, target: Node, equals_fn: Callable[[Node, Node], bool]
+    ):
+        unmatched_source_children = [
+            x for x in source.children if self.context.unmatched(x)
+        ]
+        unmatched_target_children = [
+            x for x in target.children if self.context.unmatched(x)
+        ]
+
+        for source_child, target_child in longest_common_subsequence(
+            unmatched_source_children,
+            unmatched_target_children,
+            equals_fn,
+        ):
+            if any(self.context.partner(x) for x in pre_order_walk(source_child)):
+                continue
+            if any(self.context.partner(x) for x in pre_order_walk(target_child)):
+                continue
+
+            child_match = MatchingPair(id(source_child), id(target_child))
+            self.matching_set.update(self._descendant_matches(child_match))
+
+    def _attempt_histogram_matching(self, source: Node, target: Node):
+        group_by_label = partial(group_by, key_fn=lambda x: x.label)
+
+        source_hist = group_by_label(source.children)
+        target_hist = group_by_label(target.children)
+
+        candidate_matches = (
+            MatchingPair(
+                id(first(source_hist[label])),
+                id(first(target_hist[label])),
+            )
+            for label in source_hist
+            if len(source_hist[label]) == len(target_hist[label]) == 1
+        )
+
+        for match in candidate_matches:
+            if not self.matching_set.matched(match):
+                self.matching_set.add(match)
+                self._attempt_recovery_matching(match)
 
     def _find_candidate_container_matches(self, source_tree: Node):
         """
@@ -179,7 +250,7 @@ class GumTreeMatcher(Matcher):
         source = self.context.source_nodes[match.source]
         target = self.context.target_nodes[match.target]
 
-        assert source.isomorphic_to(target)
+        assert source.can_match(target)
         assert len(source.children) == len(target.children)
 
         yield match

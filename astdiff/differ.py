@@ -32,7 +32,6 @@ class Differ:
             target_nodes={id(x): x for x in pre_order_walk(target_ast)},
         )
 
-        # TODO: Add a separate class that takes a DiffContext and prints debug info.
         logger.debug(
             "%s + %s = %s nodes in total",
             len(ctx.source_nodes),
