@@ -138,12 +138,12 @@ class GumTreeMatcher(Matcher):
         matches_before = len(self.matching_set)
 
         for source_node in post_order_walk(source_root):
-            if source_node.is_root:
+            if source_node.is_root and self.context.unmatched(source_node):
                 match = MatchingPair(id(source_root), id(target_root))
                 self._attempt_recovery_matching(match)
                 self.matching_set.add(match)
 
-            elif source_node.children and self.context.partner(source_node) is None:
+            elif source_node.children and self.context.unmatched(source_node):
                 candidate_matches = self._find_candidate_container_matches(source_node)
                 weighted_candidate_matches = (
                     (self._dice_coefficient(x), x) for x in candidate_matches
