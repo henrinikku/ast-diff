@@ -100,7 +100,7 @@ class BuiltInASTParser(Parser[ast.AST]):
                 node.lineno, node.col_offset, node.end_lineno, node.end_col_offset
             )
             if has_position_info
-            else None
+            else ""
         )
         children = tuple(self.canonicalize(x) for x in ast.iter_child_nodes(node))
         return Node(label, value, position=position, children=children)

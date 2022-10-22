@@ -1,3 +1,4 @@
+import ast
 import unittest
 
 import parso
@@ -5,10 +6,10 @@ import parso.python.tree
 import parso.tree
 
 from astdiff.ast.node import Node
-from astdiff.ast.parser import ParseOptions, ParsoParser
+from astdiff.ast.parser import BuiltInASTParser, ParseOptions, ParsoParser
 
 
-class ASTTest(unittest.TestCase):
+class ParsoParserTest(unittest.TestCase):
     def setUp(self):
         self.parser = ParsoParser(ParseOptions(add_metadata=False))
 
@@ -45,8 +46,8 @@ class ASTTest(unittest.TestCase):
         )
 
     def test_parsing_ignores_whitespace(self):
-        with_whitespace = self.parser.parse_code("print(        'foo'")
-        without_whitespace = self.parser.parse_code("print('foo'")
+        with_whitespace = self.parser.parse_code("print(        'foo')")
+        without_whitespace = self.parser.parse_code("print('foo')")
         assert with_whitespace == without_whitespace
 
     def test_parsing_ignores_parens(self):
@@ -86,6 +87,101 @@ class ASTTest(unittest.TestCase):
                                     children=(
                                         Node(
                                             label="string", value="'foo'", children=()
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+
+class BuiltInASTParserTest(unittest.TestCase):
+    def setUp(self):
+        self.parser = BuiltInASTParser(ParseOptions(add_metadata=False))
+
+    def test_parse(self):
+        ast = self.parser.parse_file("tests/data/print_123.py")
+        assert ast == Node(
+            label="Module",
+            value=None,
+            children=(
+                Node(
+                    label="Expr",
+                    value=None,
+                    children=(
+                        Node(
+                            label="Call",
+                            value=None,
+                            children=(
+                                Node(
+                                    label="Name",
+                                    value="print",
+                                    children=(
+                                        Node(label="Load", value=None, children=()),
+                                    ),
+                                ),
+                                Node(label="Constant", value="123", children=()),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+    def test_parsing_ignores_whitespace(self):
+        with_whitespace = self.parser.parse_code("print(        'foo')")
+        without_whitespace = self.parser.parse_code("print('foo')")
+        assert with_whitespace == without_whitespace
+
+    def test_parsing_ignores_parens(self):
+        with_parens = self.parser.parse_code("a = (((((((1)))))))")
+        without_parens = self.parser.parse_code("a = 1")
+        assert with_parens == without_parens
+
+    def test_create_from_builtin_ast(self):
+        builtin_ast = ast.parse("if True == True: print('foo')")
+        canonical = self.parser.canonicalize(builtin_ast)
+        assert canonical == Node(
+            label="Module",
+            value=None,
+            children=(
+                Node(
+                    label="If",
+                    value=None,
+                    children=(
+                        Node(
+                            label="Compare",
+                            value=None,
+                            children=(
+                                Node(label="Constant", value=True, children=()),
+                                Node(label="Eq", value=None, children=()),
+                                Node(label="Constant", value=True, children=()),
+                            ),
+                        ),
+                        Node(
+                            label="Expr",
+                            value=None,
+                            children=(
+                                Node(
+                                    label="Call",
+                                    value=None,
+                                    children=(
+                                        Node(
+                                            label="Name",
+                                            value="print",
+                                            children=(
+                                                Node(
+                                                    label="Load",
+                                                    value=None,
+                                                    children=(),
+                                                ),
+                                            ),
+                                        ),
+                                        Node(
+                                            label="Constant", value="foo", children=()
                                         ),
                                     ),
                                 ),
