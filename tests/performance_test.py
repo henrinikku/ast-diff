@@ -1,13 +1,14 @@
 from functools import partial
 
 import pytest
+from pytest_benchmark.fixture import BenchmarkFixture
 
-from astdiff.ast import Node
+from astdiff.ast.metadata import attach_metadata
+from astdiff.ast.node import Node
+from astdiff.ast.parser import Parser
 from astdiff.context import DiffContext
-from astdiff.gumtree import GumTreeMatcher
-from astdiff.metadata import attach_metadata
-from astdiff.parser import Parser
-from astdiff.traversal import pre_order_walk
+from astdiff.editscript.generator import WithMoveEditScriptGenerator
+from astdiff.matcher.gumtree import GumTreeMatcher
 
 
 @pytest.fixture(scope="function")
@@ -45,38 +46,94 @@ def test_metadata_calculation_performance_2k_lines(
 
 
 def test_gumtree_performance_200_lines(
-    benchmark,
+    benchmark: BenchmarkFixture,
     matcher: GumTreeMatcher,
     python_source_200_lines: Node,
     python_target_200_lines: Node,
 ):
     def setup():
-        context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(python_source_200_lines)},
-            target_nodes={id(x): x for x in pre_order_walk(python_target_200_lines)},
-        )
-        matcher.prepare(context)
+        context = DiffContext(python_source_200_lines, python_target_200_lines)
+        return [context], {}
 
-    def match_nodes():
-        return matcher.find_matching_nodes(matcher.context)
-
-    benchmark.pedantic(match_nodes, rounds=10, setup=setup)
+    benchmark.pedantic(matcher.find_matching_nodes, rounds=10, setup=setup)
 
 
 def test_gumtree_performance_2k_lines(
-    benchmark,
+    benchmark: BenchmarkFixture,
     matcher: GumTreeMatcher,
     python_source_2k_lines: Node,
     python_target_2k_lines: Node,
 ):
     def setup():
-        context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(python_source_2k_lines)},
-            target_nodes={id(x): x for x in pre_order_walk(python_target_2k_lines)},
-        )
-        matcher.prepare(context)
+        context = DiffContext(python_source_2k_lines, python_target_2k_lines)
+        return [context], {}
 
-    def match_nodes():
-        return matcher.find_matching_nodes(matcher.context)
+    benchmark.pedantic(matcher.find_matching_nodes, rounds=3, setup=setup)
 
-    benchmark.pedantic(match_nodes, rounds=3, setup=setup)
+
+def test_edit_script_generation_performance_200_lines(
+    benchmark: BenchmarkFixture,
+    matcher: GumTreeMatcher,
+    generator: WithMoveEditScriptGenerator,
+    python_source_200_lines: Node,
+    python_target_200_lines: Node,
+):
+    def setup():
+        context = DiffContext(python_source_200_lines, python_target_200_lines)
+        context.matching_set = matcher.find_matching_nodes(context)
+        return [context], {}
+
+    benchmark.pedantic(generator.generate_edit_script, rounds=10, setup=setup)
+
+
+def test_edit_script_generation_performance_2k_lines(
+    benchmark: BenchmarkFixture,
+    matcher: GumTreeMatcher,
+    generator: WithMoveEditScriptGenerator,
+    python_source_2k_lines: Node,
+    python_target_2k_lines: Node,
+):
+    def setup():
+        context = DiffContext(python_source_2k_lines, python_target_2k_lines)
+        context.matching_set = matcher.find_matching_nodes(context)
+        return [context], {}
+
+    benchmark.pedantic(generator.generate_edit_script, rounds=3, setup=setup)
+
+
+def test_diff_performance_200_lines(
+    benchmark: BenchmarkFixture,
+    matcher: GumTreeMatcher,
+    generator: WithMoveEditScriptGenerator,
+    python_source_200_lines: Node,
+    python_target_200_lines: Node,
+):
+    def setup():
+        context = DiffContext(python_source_200_lines, python_target_200_lines)
+        return [context], {}
+
+    def diff(context: DiffContext):
+        context.matching_set = matcher.find_matching_nodes(context)
+        context.edit_script = generator.generate_edit_script(context)
+        return context
+
+    benchmark.pedantic(diff, rounds=3, setup=setup)
+
+
+def test_diff_performance_2k_lines(
+    benchmark: BenchmarkFixture,
+    matcher: GumTreeMatcher,
+    generator: WithMoveEditScriptGenerator,
+    python_source_2k_lines: Node,
+    python_target_2k_lines: Node,
+):
+    def setup():
+        context = DiffContext(python_source_2k_lines, python_target_2k_lines)
+        return [context], {}
+
+    def diff(context: DiffContext):
+        context.matching_set = matcher.find_matching_nodes(context)
+        context.edit_script = generator.generate_edit_script(context)
+        return context
+
+    benchmark.pedantic(diff, rounds=3, setup=setup)

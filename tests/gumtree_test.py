@@ -1,7 +1,6 @@
-from astdiff.ast import Node
+from astdiff.ast.node import Node
 from astdiff.context import DiffContext, MatchingSet
-from astdiff.gumtree import GumTreeMatcher
-from astdiff.traversal import pre_order_walk
+from astdiff.matcher.gumtree import GumTreeMatcher
 
 
 def get_matching_pairs(matching_set: MatchingSet, context: DiffContext):
@@ -24,14 +23,13 @@ def test_anchor_matching_performance(
     benchmark, matcher: GumTreeMatcher, source: Node, target: Node
 ):
     def setup():
-        context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(source)},
-            target_nodes={id(x): x for x in pre_order_walk(target)},
-        )
+        context = DiffContext(source, target)
         matcher.prepare(context)
 
     def match_anchors():
-        return matcher.match_anchors(source, target)
+        return matcher.match_anchors(
+            matcher.context.source_root, matcher.context.target_root
+        )
 
     benchmark.pedantic(match_anchors, rounds=100, setup=setup)
 
@@ -40,15 +38,14 @@ def test_container_matching_performance(
     benchmark, matcher: GumTreeMatcher, source: Node, target: Node
 ):
     def setup():
-        context = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(source)},
-            target_nodes={id(x): x for x in pre_order_walk(target)},
-        )
+        context = DiffContext(source, target)
         matcher.prepare(context)
-        matcher.match_anchors(source, target)
+        matcher.match_anchors(context.source_root, context.target_root)
 
     def match_containers():
-        return matcher.match_containers(source, target)
+        return matcher.match_containers(
+            matcher.context.source_root, matcher.context.target_root
+        )
 
     benchmark.pedantic(match_containers, rounds=100, setup=setup)
 
@@ -67,19 +64,13 @@ def test_anchor_matching(matcher: GumTreeMatcher, source: Node, target: Node):
         (("SimpleName", "i"), ("SimpleName", "i")),
     ]
 
-    context = DiffContext(
-        source_nodes={id(x): x for x in pre_order_walk(source)},
-        target_nodes={id(x): x for x in pre_order_walk(target)},
-    )
+    context = DiffContext(source, target)
     matcher.prepare(context)
 
     matching_set = matcher.match_anchors(source, target)
     assert get_matching_pairs(matching_set, context) == expected
 
-    flipped_context = DiffContext(
-        source_nodes={id(x): x for x in pre_order_walk(target)},
-        target_nodes={id(x): x for x in pre_order_walk(source)},
-    )
+    flipped_context = DiffContext(target, source)
     matcher.prepare(flipped_context)
 
     matching_set = matcher.match_anchors(target, source)
@@ -87,10 +78,7 @@ def test_anchor_matching(matcher: GumTreeMatcher, source: Node, target: Node):
 
 
 def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node):
-    context = DiffContext(
-        source_nodes={id(x): x for x in pre_order_walk(source)},
-        target_nodes={id(x): x for x in pre_order_walk(target)},
-    )
+    context = DiffContext(source, target)
     matcher.prepare(context)
 
     matched_anchors = get_matching_pairs(
@@ -114,10 +102,7 @@ def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node)
         (("CompilationUnit", ""), ("CompilationUnit", "")),
     ]
 
-    flipped_context = DiffContext(
-        source_nodes={id(x): x for x in pre_order_walk(target)},
-        target_nodes={id(x): x for x in pre_order_walk(source)},
-    )
+    flipped_context = DiffContext(target, source)
     matcher.prepare(flipped_context)
 
     matched_anchors = get_matching_pairs(

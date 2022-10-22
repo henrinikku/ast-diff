@@ -1,7 +1,7 @@
-from astdiff.ast import Node
+from astdiff.ast.node import Node
+from astdiff.ast.parser import ParsoParser
 from astdiff.differ import diff
-from astdiff.edit_script import Delete, Update
-from astdiff.parser import ParsoParser
+from astdiff.editscript.types import Delete, Update
 
 
 def test_diff(parser: ParsoParser):

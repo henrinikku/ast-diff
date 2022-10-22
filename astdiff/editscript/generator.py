@@ -5,10 +5,10 @@ from typing import List, Set
 
 from more_itertools import first
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
+from astdiff.ast.traversal import bfs, post_order_walk
 from astdiff.context import DiffContext, MatchingPair, NodeId
-from astdiff.edit_script import Delete, EditScript, Insert, Move, Operation, Update
-from astdiff.traversal import bfs, post_order_walk
+from astdiff.editscript.types import Delete, EditScript, Insert, Move, Operation, Update
 from astdiff.util import longest_common_subsequence
 
 logger = logging.getLogger(__name__)

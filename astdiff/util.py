@@ -7,7 +7,7 @@ from typing import Callable, DefaultDict, Iterable, List, Sequence, Tuple, TypeV
 
 from more_itertools import peekable
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
 
 T = TypeVar("T")
 K = TypeVar("K")

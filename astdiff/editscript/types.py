@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 
 import typic
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
 
 
 @typic.al(strict=True)

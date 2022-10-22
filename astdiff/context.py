@@ -1,11 +1,13 @@
+from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from functools import total_ordering
 from typing import Dict, Iterable
 
 from more_itertools import first
 
-from astdiff.ast import Node
-from astdiff.edit_script import EditScript
+from astdiff.ast.node import Node
+from astdiff.ast.traversal import pre_order_walk
+from astdiff.editscript.types import EditScript
 
 NodeId = int
 
@@ -50,7 +52,7 @@ class MatchingSet:
         return (MatchingPair(s, t) for s, t in self.source_target_map.items())
 
 
-@dataclass
+@dataclass(init=False)
 class DiffContext:
     """
     Helper class for holding data that need to be passed along
@@ -58,12 +60,18 @@ class DiffContext:
     """
 
     # In data structures that require hashing, nodes are stored and acccessed
-    # by their ids in order to avoid recursive hash computations.
+    # by their ids in order to distinguish nodes with equal values from each other.
     source_nodes: Dict[NodeId, Node]
     target_nodes: Dict[NodeId, Node]
 
-    matching_set: MatchingSet = field(default_factory=MatchingSet)
-    edit_script: EditScript = field(default_factory=EditScript)
+    matching_set: MatchingSet
+    edit_script: EditScript
+
+    def __init__(self, source_tree: Node, target_tree: Node):
+        self.source_nodes = {id(x): x for x in pre_order_walk(deepcopy(source_tree))}
+        self.target_nodes = {id(x): x for x in pre_order_walk(deepcopy(target_tree))}
+        self.matching_set = MatchingSet()
+        self.edit_script = EditScript()
 
     def add_source(self, node: Node):
         assert id(node) not in self.source_nodes

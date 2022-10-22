@@ -1,12 +1,11 @@
 import pytest
 
-from astdiff.ast import Node
+from astdiff.ast.metadata import add_parents, attach_metadata
+from astdiff.ast.node import Node
+from astdiff.ast.parser import ParseOptions, ParsoParser
 from astdiff.context import DiffContext
-from astdiff.gumtree import GumTreeMatcher
-from astdiff.metadata import add_parents, attach_metadata
-from astdiff.parser import ParseOptions, ParsoParser
-from astdiff.script_generator import WithMoveEditScriptGenerator
-from astdiff.traversal import pre_order_walk
+from astdiff.editscript.generator import WithMoveEditScriptGenerator
+from astdiff.matcher.gumtree import GumTreeMatcher
 
 
 @pytest.fixture(scope="function")
@@ -240,9 +239,6 @@ def target():
 
 @pytest.fixture(scope="function")
 def post_matching_context(matcher: GumTreeMatcher, source: Node, target: Node):
-    context = DiffContext(
-        source_nodes={id(x): x for x in pre_order_walk(source)},
-        target_nodes={id(x): x for x in pre_order_walk(target)},
-    )
+    context = DiffContext(source, target)
     context.matching_set = matcher.find_matching_nodes(context)
     return context

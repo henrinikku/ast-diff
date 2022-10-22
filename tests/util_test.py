@@ -1,4 +1,4 @@
-from astdiff.ast import Node, NodeMetadata
+from astdiff.ast.node import Node, NodeMetadata
 from astdiff.util import HeightIndexedPriorityQueue, longest_common_subsequence
 
 

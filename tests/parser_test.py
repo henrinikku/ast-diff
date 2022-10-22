@@ -4,8 +4,8 @@ import parso
 import parso.python.tree
 import parso.tree
 
-from astdiff.ast import Node
-from astdiff.parser import ParseOptions, ParsoParser
+from astdiff.ast.node import Node
+from astdiff.ast.parser import ParseOptions, ParsoParser
 
 
 class ASTTest(unittest.TestCase):

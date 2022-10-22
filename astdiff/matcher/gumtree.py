@@ -8,10 +8,10 @@ from typing import Callable, Dict, List, Set
 
 from more_itertools import first
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
+from astdiff.ast.traversal import descendants, post_order_walk, pre_order_walk
 from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
-from astdiff.matcher import Matcher
-from astdiff.traversal import descendants, post_order_walk, pre_order_walk
+from astdiff.matcher.base import Matcher
 from astdiff.util import (
     HeightIndexedPriorityQueue,
     group_by,

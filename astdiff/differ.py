@@ -1,11 +1,13 @@
 import logging
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
 from astdiff.context import DiffContext
-from astdiff.gumtree import GumTreeMatcher
-from astdiff.matcher import Matcher
-from astdiff.script_generator import EditScriptGenerator, WithMoveEditScriptGenerator
-from astdiff.traversal import pre_order_walk
+from astdiff.editscript.generator import (
+    EditScriptGenerator,
+    WithMoveEditScriptGenerator,
+)
+from astdiff.matcher.base import Matcher
+from astdiff.matcher.gumtree import GumTreeMatcher
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +28,7 @@ class Differ:
     def diff(self, source_ast: Node, target_ast: Node):
         logger.debug("Diffing...")
 
-        # TODO: Add constructor for diffcontext
-        ctx = DiffContext(
-            source_nodes={id(x): x for x in pre_order_walk(source_ast)},
-            target_nodes={id(x): x for x in pre_order_walk(target_ast)},
-        )
+        ctx = DiffContext(source_ast, target_ast)
 
         logger.debug(
             "%s + %s = %s nodes in total",

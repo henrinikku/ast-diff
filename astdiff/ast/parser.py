@@ -8,8 +8,8 @@ import parso
 from parso.python.tree import EndMarker, Newline, Operator
 from parso.tree import NodeOrLeaf as ParsoNode
 
-from astdiff.ast import Node, NodePosition
-from astdiff.metadata import add_parents, attach_metadata
+from astdiff.ast.metadata import add_parents, attach_metadata
+from astdiff.ast.node import Node, NodePosition
 
 
 @dataclass(frozen=True)
@@ -75,7 +75,16 @@ class BuiltInASTParser(Parser[ast.AST]):
         return ast.parse(code)
 
     def canonicalize(self, node: ast.AST):
-        raise NotImplementedError()
+        label = type(node).__name__
+        value = self._get_value(node)
+        position = NodePosition(
+            node.lineno, node.col_offset, node.end_lineno, node.end_col_offset
+        )
+        children = tuple(self.canonicalize(x) for x in ast.iter_child_nodes(node))
+        return Node(label, value, position=position, children=children)
+
+    def _get_value(self, node: ast.AST):
+        pass
 
 
 class ParsoParser(Parser[ParsoNode]):

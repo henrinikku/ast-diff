@@ -1,7 +1,7 @@
 import unittest
 
-from astdiff.ast import Node
-from astdiff.traversal import post_order_walk, pre_order_walk
+from astdiff.ast.node import Node
+from astdiff.ast.traversal import post_order_walk, pre_order_walk
 
 
 class TraversalTest(unittest.TestCase):

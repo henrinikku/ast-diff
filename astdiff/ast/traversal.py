@@ -1,6 +1,6 @@
 from collections import deque
 
-from astdiff.ast import Node
+from astdiff.ast.node import Node
 
 
 def descendants(node: Node):
