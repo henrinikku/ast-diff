@@ -109,7 +109,7 @@ class BuiltInASTParser(Parser[ast.AST]):
         for fieldname in self._POSSIBLE_VALUE_FIELDS:
             value = getattr(node, fieldname, self._MISSING)
             if value is not self._MISSING and isinstance(value, self._PRIMITIVE_TYPES):
-                return value
+                return str(value)
 
 
 class ParsoParser(Parser[ParsoNode]):

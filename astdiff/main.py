@@ -20,7 +20,7 @@ app = typer.Typer()
 def diff(
     source: str,
     target: str,
-    parser_type: ParserType = typer.Option(ParserType.parso),
+    parser_type: ParserType = typer.Option(ParserType.builtin_ast),
     log_level: int = typer.Option(logging.INFO),
 ):
     """
