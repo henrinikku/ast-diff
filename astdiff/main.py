@@ -2,16 +2,15 @@ import logging
 
 import typer
 
-from astdiff.ast.parser import ParseOptions, ParsoParser
+from astdiff.ast.parser import ParseOptions
+from astdiff.ast.parser_factory import ParserType, build_parser
 from astdiff.differ import diff as diff_asts
 
 logger = logging.getLogger(__name__)
 
-parser = ParsoParser(
-    options=ParseOptions(
-        add_metadata=True,
-        add_parent=True,
-    )
+parse_options = ParseOptions(
+    add_metadata=True,
+    add_parent=True,
 )
 
 app = typer.Typer()
@@ -21,6 +20,7 @@ app = typer.Typer()
 def diff(
     source: str,
     target: str,
+    parser_type: ParserType = typer.Option(ParserType.parso),
     log_level: int = typer.Option(logging.INFO),
 ):
     """
@@ -31,6 +31,7 @@ def diff(
 
     logger.debug("Comparing '%s' and '%s'...", source, target)
 
+    parser = build_parser(parser_type, parse_options)
     source_ast = parser.parse(source)
     target_ast = parser.parse(target)
 
