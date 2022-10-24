@@ -43,10 +43,11 @@ class BuiltInASTParser(Parser[ast.AST]):
         children = tuple(self.canonicalize(x) for x in ast.iter_child_nodes(node))
         return Node(label, value, position=position, children=children)
 
-    def _get_value(self, node: ast.AST):
-        for fieldname in self._POSSIBLE_VALUE_FIELDS:
-            value = getattr(node, fieldname, self._MISSING)
-            if value is not self._MISSING and isinstance(value, self._PRIMITIVE_TYPES):
+    @classmethod
+    def _get_value(cls, node: ast.AST):
+        for fieldname in cls._POSSIBLE_VALUE_FIELDS:
+            value = getattr(node, fieldname, cls._MISSING)
+            if value is not cls._MISSING and isinstance(value, cls._PRIMITIVE_TYPES):
                 return str(value)
 
         return ""
