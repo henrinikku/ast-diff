@@ -7,7 +7,7 @@ from more_itertools import first
 
 from astdiff.ast.node import Node
 from astdiff.ast.traversal import pre_order_walk
-from astdiff.editscript.types import EditScript
+from astdiff.editscript.ops import EditScript
 
 NodeId = int
 

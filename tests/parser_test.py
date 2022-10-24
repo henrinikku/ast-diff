@@ -6,7 +6,9 @@ import parso.python.tree
 import parso.tree
 
 from astdiff.ast.node import Node
-from astdiff.ast.parser import BuiltInASTParser, ParseOptions, ParsoParser
+from astdiff.parser.base import ParseOptions
+from astdiff.parser.builtin import BuiltInASTParser
+from astdiff.parser.parso import ParsoParser
 
 
 class ParsoParserTest(unittest.TestCase):
@@ -106,21 +108,21 @@ class BuiltInASTParserTest(unittest.TestCase):
         ast = self.parser.parse_file("tests/data/print_123.py")
         assert ast == Node(
             label="Module",
-            value=None,
+            value="",
             children=(
                 Node(
                     label="Expr",
-                    value=None,
+                    value="",
                     children=(
                         Node(
                             label="Call",
-                            value=None,
+                            value="",
                             children=(
                                 Node(
                                     label="Name",
                                     value="print",
                                     children=(
-                                        Node(label="Load", value=None, children=()),
+                                        Node(label="Load", value="", children=()),
                                     ),
                                 ),
                                 Node(label="Constant", value="123", children=()),
@@ -146,37 +148,35 @@ class BuiltInASTParserTest(unittest.TestCase):
         canonical = self.parser.canonicalize(builtin_ast)
         assert canonical == Node(
             label="Module",
-            value=None,
+            value="",
             children=(
                 Node(
                     label="If",
-                    value=None,
+                    value="",
                     children=(
                         Node(
                             label="Compare",
-                            value=None,
+                            value="",
                             children=(
-                                Node(label="Constant", value=True, children=()),
-                                Node(label="Eq", value=None, children=()),
-                                Node(label="Constant", value=True, children=()),
+                                Node(label="Constant", value="True", children=()),
+                                Node(label="Eq", value="", children=()),
+                                Node(label="Constant", value="True", children=()),
                             ),
                         ),
                         Node(
                             label="Expr",
-                            value=None,
+                            value="",
                             children=(
                                 Node(
                                     label="Call",
-                                    value=None,
+                                    value="",
                                     children=(
                                         Node(
                                             label="Name",
                                             value="print",
                                             children=(
                                                 Node(
-                                                    label="Load",
-                                                    value=None,
-                                                    children=(),
+                                                    label="Load", value="", children=()
                                                 ),
                                             ),
                                         ),

@@ -2,9 +2,9 @@ import logging
 
 import typer
 
-from astdiff.ast.parser import ParseOptions
-from astdiff.ast.parser_factory import ParserType, build_parser
 from astdiff.differ import diff as diff_asts
+from astdiff.parser.base import ParseOptions
+from astdiff.parser.factory import ParserType, build_parser
 
 logger = logging.getLogger(__name__)
 

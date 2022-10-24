@@ -67,13 +67,15 @@ def test_anchor_matching(matcher: GumTreeMatcher, source: Node, target: Node):
     context = DiffContext(source, target)
     matcher.prepare(context)
 
-    matching_set = matcher.match_anchors(source, target)
+    matching_set = matcher.match_anchors(context.source_root, context.target_root)
     assert get_matching_pairs(matching_set, context) == expected
 
     flipped_context = DiffContext(target, source)
     matcher.prepare(flipped_context)
 
-    matching_set = matcher.match_anchors(target, source)
+    matching_set = matcher.match_anchors(
+        flipped_context.source_root, flipped_context.target_root
+    )
     assert get_matching_pairs(matching_set, flipped_context) == expected
 
 
@@ -82,11 +84,11 @@ def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node)
     matcher.prepare(context)
 
     matched_anchors = get_matching_pairs(
-        matcher.match_anchors(source, target),
+        matcher.match_anchors(context.source_root, context.target_root),
         context,
     )
     matched_nodes = get_matching_pairs(
-        matcher.match_containers(source, target),
+        matcher.match_containers(context.source_root, context.target_root),
         context,
     )
     matched_containers = matched_nodes[len(matched_anchors) :]
@@ -106,11 +108,13 @@ def test_container_matching(matcher: GumTreeMatcher, source: Node, target: Node)
     matcher.prepare(flipped_context)
 
     matched_anchors = get_matching_pairs(
-        matcher.match_anchors(target, source),
+        matcher.match_anchors(flipped_context.source_root, flipped_context.target_root),
         flipped_context,
     )
     matched_nodes = get_matching_pairs(
-        matcher.match_containers(target, source),
+        matcher.match_containers(
+            flipped_context.source_root, flipped_context.target_root
+        ),
         flipped_context,
     )
     matched_containers = matched_nodes[len(matched_anchors) :]

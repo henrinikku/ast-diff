@@ -8,7 +8,7 @@ from more_itertools import first
 from astdiff.ast.node import Node
 from astdiff.ast.traversal import bfs, post_order_walk
 from astdiff.context import DiffContext, MatchingPair, NodeId
-from astdiff.editscript.types import Delete, EditScript, Insert, Move, Operation, Update
+from astdiff.editscript.ops import Delete, EditScript, Insert, Move, Operation, Update
 from astdiff.util import longest_common_subsequence
 
 logger = logging.getLogger(__name__)

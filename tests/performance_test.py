@@ -5,10 +5,10 @@ from pytest_benchmark.fixture import BenchmarkFixture
 
 from astdiff.ast.metadata import attach_metadata
 from astdiff.ast.node import Node
-from astdiff.ast.parser import Parser
 from astdiff.context import DiffContext
 from astdiff.editscript.generator import WithMoveEditScriptGenerator
 from astdiff.matcher.gumtree import GumTreeMatcher
+from astdiff.parser.base import Parser
 
 
 @pytest.fixture(scope="function")

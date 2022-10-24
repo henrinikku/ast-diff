@@ -1,6 +1,6 @@
 from astdiff.ast.metadata import attach_metadata
 from astdiff.ast.node import Node
-from astdiff.ast.parser import ParsoParser
+from astdiff.parser.parso import ParsoParser
 
 
 def test_size_calculation_parsed_tree(parser: ParsoParser):

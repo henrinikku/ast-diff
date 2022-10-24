@@ -2,10 +2,11 @@ import pytest
 
 from astdiff.ast.metadata import add_parents, attach_metadata
 from astdiff.ast.node import Node
-from astdiff.ast.parser import ParseOptions, ParsoParser
 from astdiff.context import DiffContext
 from astdiff.editscript.generator import WithMoveEditScriptGenerator
 from astdiff.matcher.gumtree import GumTreeMatcher
+from astdiff.parser.base import ParseOptions
+from astdiff.parser.parso import ParsoParser
 
 
 @pytest.fixture(scope="function")

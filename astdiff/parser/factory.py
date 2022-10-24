@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Callable, Dict
 
-from astdiff.ast.parser import BuiltInASTParser, ParseOptions, Parser, ParsoParser
+from astdiff.parser.base import ParseOptions, Parser
+from astdiff.parser.builtin import BuiltInASTParser
+from astdiff.parser.parso import ParsoParser
 
 
 class ParserType(str, Enum):
@@ -9,12 +11,14 @@ class ParserType(str, Enum):
     builtin_ast = "builtin-ast"
 
 
-PARSER_FACTORY_MAP: Dict[ParserType, Callable[[ParseOptions], Parser]] = {
+ParserFactoryFn = Callable[[ParseOptions], Parser]
+
+PARSER_TYPE_FACTORY_MAP: Dict[ParserType, ParserFactoryFn] = {
     ParserType.parso: ParsoParser,
     ParserType.builtin_ast: BuiltInASTParser,
 }
 
 
 def build_parser(parser_type: ParserType, options: ParseOptions):
-    factory_fn = PARSER_FACTORY_MAP[parser_type]
+    factory_fn = PARSER_TYPE_FACTORY_MAP[parser_type]
     return factory_fn(options)
