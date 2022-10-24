@@ -6,7 +6,7 @@ from pytest_benchmark.fixture import BenchmarkFixture
 from astdiff.ast.metadata import attach_metadata
 from astdiff.ast.node import Node
 from astdiff.context import DiffContext
-from astdiff.editscript.generator import WithMoveEditScriptGenerator
+from astdiff.generator.with_move import WithMoveEditScriptGenerator
 from astdiff.matcher.gumtree import GumTreeMatcher
 from astdiff.parser.base import Parser
 

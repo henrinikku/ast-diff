@@ -1,7 +1,7 @@
 from astdiff.ast.node import Node
 from astdiff.context import DiffContext
-from astdiff.editscript.generator import WithMoveEditScriptGenerator
 from astdiff.editscript.ops import Insert, Move, Update
+from astdiff.generator.with_move import WithMoveEditScriptGenerator
 
 
 def test_edit_scrit_generation(

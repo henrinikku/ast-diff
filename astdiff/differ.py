@@ -2,10 +2,8 @@ import logging
 
 from astdiff.ast.node import Node
 from astdiff.context import DiffContext
-from astdiff.editscript.generator import (
-    EditScriptGenerator,
-    WithMoveEditScriptGenerator,
-)
+from astdiff.generator.base import EditScriptGenerator
+from astdiff.generator.with_move import WithMoveEditScriptGenerator
 from astdiff.matcher.base import Matcher
 from astdiff.matcher.gumtree import GumTreeMatcher
 

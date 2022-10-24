@@ -1,5 +1,4 @@
 import logging
-from abc import ABC, abstractmethod
 from itertools import product
 from typing import List, Set
 
@@ -8,21 +7,12 @@ from more_itertools import first
 from astdiff.ast.node import Node
 from astdiff.ast.traversal import bfs, post_order_walk
 from astdiff.context import DiffContext, MatchingPair, NodeId
-from astdiff.editscript.ops import Delete, EditScript, Insert, Move, Operation, Update
+from astdiff.editscript import EditScript
+from astdiff.editscript.ops import Delete, Insert, Move, Operation, Update
+from astdiff.generator.base import EditScriptGenerator
 from astdiff.util import longest_common_subsequence
 
 logger = logging.getLogger(__name__)
-
-
-class EditScriptGenerator(ABC):
-    """
-    Base class for all edit script generator implementations.
-    Some implementations might for example consider move operations and some might not.
-    """
-
-    @abstractmethod
-    def generate_edit_script(self, context: DiffContext) -> EditScript:
-        ...
 
 
 class WithMoveEditScriptGenerator(EditScriptGenerator):
