@@ -49,7 +49,7 @@ class Node:
 
     @property
     def siblings(self):
-        return (self.parent and self.parent.children) or tuple()
+        return (self.parent and self.parent.children) or ()
 
     @siblings.setter
     def siblings(self, value: Tuple["Node", ...]):
@@ -58,7 +58,7 @@ class Node:
 
     @property
     def compare_fields(self):
-        hashcode = (self.metadata and (self.metadata.hashcode,)) or tuple()
+        hashcode = (self.metadata and (self.metadata.hashcode,)) or ()
         return (self.label, self.value, len(self.children)) + hashcode
 
     def standalone(self):

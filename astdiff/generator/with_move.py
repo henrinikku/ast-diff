@@ -92,7 +92,7 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             if self.context.matching_set.target_source_map.get(x) in source_children
         ]
 
-        # Use dict to preserve order for easier debugging.
+        # Use dict to preserve ordering of pairs for easier debugging.
         longest_common_subseq = dict.fromkeys(
             (id(s), id(t))
             for s, t in longest_common_subsequence(

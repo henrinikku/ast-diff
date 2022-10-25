@@ -9,7 +9,7 @@ def test_size_calculation_parsed_tree(parser: ParsoParser):
 
 
 def test_size_calculation_empty_tree():
-    tree = Node("test", "", tuple())
+    tree = Node("test", "", ())
     attach_metadata(tree)
     assert tree.metadata.size == 1
 
@@ -20,7 +20,7 @@ def test_height_calculation_parsed_tree(parser: ParsoParser):
 
 
 def test_height_calculation_empty_tree():
-    tree = Node("test", "", tuple())
+    tree = Node("test", "", ())
     attach_metadata(tree)
     assert tree.metadata.height == 1
 
