@@ -14,7 +14,10 @@ K = TypeVar("K")
 
 
 def group_by(items: Iterable[T], key_fn: Callable[[T], K]):
-    initial: DefaultDict[K, T] = defaultdict(list)
+    """
+    Groups items into buckets using the given key function.
+    """
+    initial: DefaultDict[K, List[T]] = defaultdict(list)
     return reduce(
         lambda res, item: res[key_fn(item)].append(item) or res,
         items,
@@ -27,6 +30,12 @@ def longest_common_subsequence(
     target: Sequence[T],
     equals_fn: Callable[[T, T], bool] = operator.eq,
 ):
+    """
+    Calculates and returns the longest common subsequence using the given function
+    to determine equality.
+
+    See 'util_test.py' for example usage.
+    """
     # Calculate length
     cache = defaultdict(lambda: defaultdict(int))
 
@@ -63,6 +72,8 @@ def longest_common_subsequence(
 class HeightIndexedPriorityQueue:
     """
     Priority queue that keeps nodes in descending order based on height.
+
+    See 'util_test.py' for example usage.
     """
 
     def __init__(self):

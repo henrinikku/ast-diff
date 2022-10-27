@@ -23,17 +23,26 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
     """
 
     def prepare(self, context: DiffContext):
+        """
+        Initializes class members needed for executing the script generation algorithm.
+        """
         logger.debug(
             "Matched nodes:\n%s",
             "\n".join([str((x, y)) for x, y in context.matched_nodes]),
         )
 
-        # TODO: Deep copy context before applying changes
+        # It would be more "correct" to use a deep copy of the context
+        # instead of the original one. However, using the original context is
+        # convenient for testing since it allows us to ensure without extra overhead
+        # that the generated edit actions can indeed transform 'source' to 'target'.
         self.context = context
         self.in_order: Set[NodeId] = set()
         self.ops: List[Operation] = []
 
     def generate_edit_script(self, context: DiffContext):
+        """
+        Generates an edit script using the algorithm developed by Chawathe et al.
+        """
         self.prepare(context)
 
         for target in bfs(context.target_root):
@@ -75,6 +84,14 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
         return EditScript(self.ops)
 
     def _align_children(self, source: Node, target: Node):
+        """
+        Uses the longest common subsequence algorithm to find and realign
+        source child nodes whose relative ordering does not match that of
+        their partner's.
+
+        See page 5 of https://dl.acm.org/doi/pdf/10.1145/235968.233366
+        for more formal step-by-step definition.
+        """
         source_children = list(map(id, source.children))
         target_children = list(map(id, target.children))
 
@@ -121,6 +138,9 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
                 self.in_order.update(child_pair)
 
     def _find_position(self, target: Node):
+        """
+        Given a target node, returns the position of the corresponding source node.
+        """
         in_order_siblings = [
             target_sibling
             for target_sibling in target.siblings
@@ -131,10 +151,11 @@ class WithMoveEditScriptGenerator(EditScriptGenerator):
             return 0
 
         rightmost = None
-        for sibling in in_order_siblings:
+        for sibling in target.siblings:
             if sibling is target:
                 break
-            rightmost = sibling
+            if id(sibling) in self.in_order:
+                rightmost = sibling
 
         source = self.context.partner(rightmost)
         return 0 if source is None else source.position_in_siblings + 1

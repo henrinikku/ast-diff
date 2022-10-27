@@ -6,6 +6,7 @@ from astdiff.context import DiffContext
 from astdiff.generator.with_move import WithMoveEditScriptGenerator
 from astdiff.matcher.gumtree import GumTreeMatcher
 from astdiff.parser.base import ParseOptions
+from astdiff.parser.builtin import BuiltInASTParser
 from astdiff.parser.parso import ParsoParser
 
 
@@ -25,6 +26,16 @@ def no_metadata_parser():
         options=ParseOptions(
             add_metadata=False,
             add_parent=False,
+        )
+    )
+
+
+@pytest.fixture(scope="function")
+def builtin_parser():
+    return BuiltInASTParser(
+        options=ParseOptions(
+            add_metadata=True,
+            add_parent=True,
         )
     )
 
