@@ -1,6 +1,8 @@
 from astdiff.ast.node import Node
-from astdiff.differ import diff
+from astdiff.differ import Differ, diff
 from astdiff.editscript.ops import Delete, Move, Update
+from astdiff.generator.base import EditScriptGenerator
+from astdiff.matcher.base import Matcher
 from astdiff.parser.builtin import BuiltInASTParser
 from astdiff.parser.parso import ParsoParser
 
@@ -72,3 +74,21 @@ def test_diff_move_update_builtin_parser(builtin_parser: BuiltInASTParser):
         ),
         Update(node=Node(label="alias", value="os"), value="logging"),
     )
+
+
+def test_diff_without_matching(
+    builtin_parser: BuiltInASTParser,
+    stub_matcher: Matcher,
+    generator: EditScriptGenerator,
+):
+    source_ast = builtin_parser.parse_code("print('123')")
+    target_ast = builtin_parser.parse_code("print('321')")
+
+    source_size = source_ast.metadata.size
+    target_size = target_ast.metadata.size
+
+    differ = Differ(stub_matcher, generator)
+    context = differ.diff(source_ast, target_ast)
+
+    assert context.source_root == context.target_root
+    assert len(context.edit_script) == source_size + target_size

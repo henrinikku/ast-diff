@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def diff(source_ast: Node, target_ast: Node):
+    """
+    Returns a diff of given ASTs.
+    """
     matcher = GumTreeMatcher()
     generator = WithMoveEditScriptGenerator()
     differ = Differ(matcher, generator)
@@ -19,11 +22,18 @@ def diff(source_ast: Node, target_ast: Node):
 
 
 class Differ:
+    """
+    Implements AST diffing using given node matcher and edit script generator.
+    """
+
     def __init__(self, matcher: Matcher, generator: EditScriptGenerator):
         self.matcher = matcher
         self.generator = generator
 
     def diff(self, source_ast: Node, target_ast: Node):
+        """
+        Returns a context containing the diff between given ASTs.
+        """
         logger.debug("Diffing...")
 
         ctx = DiffContext(source_ast, target_ast)

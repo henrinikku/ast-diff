@@ -29,9 +29,15 @@ class ParsoParser(Parser[ParsoNode]):
     )
 
     def parse_with_lib(self, code: str) -> ParsoNode:
+        """
+        Parses the given code using the 'parso' library.
+        """
         return parso.parse(code)
 
     def canonicalize(self, node: ParsoNode):
+        """
+        Transforms the parso AST to an AST used by this program.
+        """
         label = node.type
         value = getattr(node, "value", "")
         position = NodePosition(*node.start_pos, *node.end_pos)
@@ -44,6 +50,9 @@ class ParsoParser(Parser[ParsoNode]):
 
     @classmethod
     def _iter_child_nodes(cls, node: ParsoNode):
+        """
+        Yields child nodes of given parso node while flattening atom nodes.
+        """
         children: List[ParsoNode] = getattr(node, "children", [])
         for child in children:
             if child.type == "atom":
@@ -53,6 +62,9 @@ class ParsoParser(Parser[ParsoNode]):
 
     @classmethod
     def _redundant(cls, node: ParsoNode):
+        """
+        Tells if given parso node is redundant.
+        """
         if isinstance(node, cls._REDUNDANT_NODES):
             return True
 

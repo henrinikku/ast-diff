@@ -1,17 +1,16 @@
 import logging
-from collections import defaultdict
-from dataclasses import dataclass, field
 from functools import partial
 from itertools import product
 from math import inf
-from typing import Callable, Dict, List, Set
+from typing import Callable, List
 
 from more_itertools import first
 
 from astdiff.ast.node import Node
 from astdiff.ast.traversal import descendants, post_order_walk, pre_order_walk
-from astdiff.context import DiffContext, MatchingPair, MatchingSet, NodeId
+from astdiff.context import DiffContext, MatchingPair, MatchingSet
 from astdiff.matcher.base import Matcher
+from astdiff.matcher.gumtree_utils import Mapping, MappingStore
 from astdiff.util import (
     HeightIndexedPriorityQueue,
     group_by,
@@ -45,6 +44,10 @@ class GumTreeMatcher(Matcher):
         self.min_dice = min_dice
 
     def find_matching_nodes(self, context: DiffContext):
+        """
+        Generates a matching set using the GumTree algorithm and attaches it to
+        the given context.
+        """
         self.prepare(context)
 
         self.match_anchors(context.source_root, context.target_root)
@@ -53,6 +56,10 @@ class GumTreeMatcher(Matcher):
         return self.matching_set
 
     def prepare(self, context: DiffContext):
+        """
+        Initializes class members needed for executing the GumTree algorithm and
+        binds a new matching set to the given context.
+        """
         self.context = context
         self.matching_set = self.context.matching_set = MatchingSet()
 
@@ -60,6 +67,8 @@ class GumTreeMatcher(Matcher):
         """
         Performs greedy top-down search of the greatest isomorphic subtrees
         between source and target.
+
+        For a more detailed description, see section 3.1 of the GumTree paper.
         """
         candidate_mappings: List[Mapping] = []
 
@@ -135,6 +144,11 @@ class GumTreeMatcher(Matcher):
         return self.matching_set
 
     def match_containers(self, source_root: Node, target_root: Node):
+        """
+        Implements the bottom-up phase of the GumTree-algorithm.
+
+        For a more detailed description, see section 3.2 of the GumTree paper.
+        """
         matches_before = len(self.matching_set)
 
         for source_node in post_order_walk(source_root):
@@ -162,6 +176,10 @@ class GumTreeMatcher(Matcher):
         return self.matching_set
 
     def _attempt_recovery_matching(self, match: MatchingPair):
+        """
+        Implements recovery matching. That is, tries to find from the children of
+        given nodes new matches that have previously been missed previously.
+        """
         logger.debug("Finding recovery matches...")
 
         source = self.context.source_nodes[match.source]
@@ -186,6 +204,10 @@ class GumTreeMatcher(Matcher):
     def _attempt_longest_common_subsequence_matching(
         self, source: Node, target: Node, equals_fn: Callable[[Node, Node], bool]
     ):
+        """
+        Looks for unmatched but matchable subtrees using
+        the longest common subsequence algorithm and the given equality function.
+        """
         unmatched_source_children = [
             x for x in source.children if self.context.unmatched(x)
         ]
@@ -207,6 +229,10 @@ class GumTreeMatcher(Matcher):
             self.matching_set.update(self._descendant_matches(child_match))
 
     def _attempt_histogram_matching(self, source: Node, target: Node):
+        """
+        Looks for unmatched but matchable subtrees by searching nodes that have
+        an unique label among their siblings.
+        """
         group_by_label = partial(group_by, key_fn=lambda x: x.label)
 
         source_hist = group_by_label(source.children)
@@ -228,7 +254,8 @@ class GumTreeMatcher(Matcher):
 
     def _find_candidate_container_matches(self, source_tree: Node):
         """
-        Yields target nodes matched with descendants of given source node.
+        Yields target nodes matched with descendants of given source node. Used in
+        the bottom-up phase of the GumTree algorithm.
         """
         seen = set()
         for source in descendants(source_tree):
@@ -247,6 +274,9 @@ class GumTreeMatcher(Matcher):
                 seen.add(id(target))
 
     def _descendant_matches(self, match: MatchingPair):
+        """
+        Yields submatches of trees that share the same structure.
+        """
         source = self.context.source_nodes[match.source]
         target = self.context.target_nodes[match.target]
 
@@ -283,62 +313,3 @@ class GumTreeMatcher(Matcher):
             * common_descendant_matches
             / (len(source_descendants) + len(target_descendants))
         )
-
-
-@dataclass
-class Mapping:
-    """
-    Represents possible mappings between isomorphic nodes.
-    """
-
-    source_ids: Set[NodeId] = field(default_factory=set)
-    target_ids: Set[NodeId] = field(default_factory=set)
-
-    def max_size(self, context: DiffContext):
-        return max(
-            context.source_nodes[source_id].metadata.size
-            for source_id in self.source_ids
-        )
-
-    @property
-    def duplicate(self):
-        return (
-            self.source_ids
-            and self.target_ids
-            and (len(self.source_ids) > 1 or len(self.target_ids) > 1)
-        )
-
-    @property
-    def unique(self):
-        return len(self.source_ids) == len(self.target_ids) == 1
-
-    @property
-    def unmatched(self):
-        return not all((self.source_ids, self.target_ids))
-
-
-class MappingStore:
-    """
-    Helper class for grouping matching (i.e. isomorphic) nodes.
-    """
-
-    def __init__(self):
-        self.mappings: Dict[int, Mapping] = defaultdict(Mapping)
-
-    def add_source(self, node: Node):
-        self.mappings[node.metadata.hashcode].source_ids.add(id(node))
-
-    def add_target(self, node: Node):
-        self.mappings[node.metadata.hashcode].target_ids.add(id(node))
-
-    def candidate_mappings(self):
-        """
-        Mappings with more than one possible mapping.
-        """
-        return (x for x in self.mappings.values() if x.duplicate)
-
-    def unique_mappings(self):
-        return (x for x in self.mappings.values() if x.unique)
-
-    def unmatched_mappings(self):
-        return (x for x in self.mappings.values() if x.unmatched)

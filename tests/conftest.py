@@ -4,6 +4,7 @@ from astdiff.ast.metadata import add_parents, attach_metadata
 from astdiff.ast.node import Node
 from astdiff.context import DiffContext
 from astdiff.generator.with_move import WithMoveEditScriptGenerator
+from astdiff.matcher.base import StubMatcher
 from astdiff.matcher.gumtree import GumTreeMatcher
 from astdiff.parser.base import ParseOptions
 from astdiff.parser.builtin import BuiltInASTParser
@@ -43,6 +44,11 @@ def builtin_parser():
 @pytest.fixture(scope="function")
 def matcher():
     return GumTreeMatcher()
+
+
+@pytest.fixture(scope="function")
+def stub_matcher():
+    return StubMatcher()
 
 
 @pytest.fixture(scope="function")

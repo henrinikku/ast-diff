@@ -30,17 +30,27 @@ class Parser(ABC, Generic[T]):
 
     @final
     def parse(self, input: str) -> Node:
+        """
+        Parses the input (python code or path to a python file) and
+        returns the resulting AST.
+        """
         return (
             self.parse_file(input) if input.endswith(".py") else self.parse_code(input)
         )
 
     @final
     def parse_file(self, file_path: str) -> Node:
+        """
+        Parses the given source file and returns the resulting AST.
+        """
         code = Path(file_path).read_text()
         return self.parse_code(code)
 
     @final
     def parse_code(self, code: str) -> Node:
+        """
+        Parses the given code and returns the resulting AST.
+        """
         tree = self.parse_with_lib(code)
         canonical_tree = self.canonicalize(tree)
 
@@ -54,8 +64,15 @@ class Parser(ABC, Generic[T]):
 
     @abstractmethod
     def parse_with_lib(self, code: str) -> T:
+        """
+        Parses the code using an external library.
+        """
         ...
 
     @abstractmethod
     def canonicalize(self, node: T) -> Node:
+        """
+        Normalizes the AST returned by an external library to the format
+        used internally by this program.
+        """
         ...

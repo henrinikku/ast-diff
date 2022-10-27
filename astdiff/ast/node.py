@@ -5,6 +5,10 @@ from typing import Optional, Tuple
 
 @dataclass(frozen=True)
 class NodeMetadata:
+    """
+    Helper class for holding metadata that is calculated for each node after parsing.
+    """
+
     hashcode: int
     """
     Trees have the same hashcode iff they are isomorphic.
@@ -17,6 +21,10 @@ class NodeMetadata:
 
 @dataclass(frozen=True)
 class NodePosition:
+    """
+    Represents the start and end positions of a node in the code file.
+    """
+
     start_line: int
     start_col: int
     end_line: int
@@ -26,6 +34,10 @@ class NodePosition:
 @total_ordering
 @dataclass
 class Node:
+    """
+    Represents a node in an AST.
+    """
+
     label: str
     value: str
     children: Tuple["Node", ...] = field(default_factory=tuple, repr=False)
@@ -58,18 +70,28 @@ class Node:
 
     @property
     def compare_fields(self):
+        """
+        Fields used for comparing nodes. The ordering of nodes is not important
+        but it must be stable.
+        """
         hashcode = (self.metadata and (self.metadata.hashcode,)) or ()
         return (self.label, self.value, len(self.children)) + hashcode
 
     def standalone(self):
+        """
+        Returns a copy of self without references to other nodes. Used simplify testing.
+        """
         return replace(self, children=(), parent=None, metadata=None)
 
     def can_match(self, other: "Node"):
+        """
+        Defines the minimum criteria for forming a match between two nodes.
+        """
         return self.label == other.label
 
     def isomorphic_to(self, other: "Node"):
         """
-        Checks if self is isomorphic to given tree.
+        Checks if self is isomorphic to given tree using pre-calculated hashcodes.
         """
         return (
             self.metadata
@@ -80,6 +102,7 @@ class Node:
     def isomorphic_to_without_values(self, other: "Node"):
         """
         Checks if self is isomporphic to given tree when node values are ignored.
+        Runs in linear time when 'self' and 'other' are isomorphic without values.
         """
         return (
             self

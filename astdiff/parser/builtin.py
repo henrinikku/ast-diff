@@ -27,9 +27,15 @@ class BuiltInASTParser(Parser[ast.AST]):
     _MISSING = object()
 
     def parse_with_lib(self, code: str) -> ast.AST:
+        """
+        Parses the given code using Python's built-in 'ast' library.
+        """
         return ast.parse(code)
 
     def canonicalize(self, node: ast.AST):
+        """
+        Transforms the built-in Python AST to an AST used by this program.
+        """
         label = type(node).__name__
         value = self._get_value(node)
         has_position_info = hasattr(node, "lineno")
@@ -45,6 +51,9 @@ class BuiltInASTParser(Parser[ast.AST]):
 
     @classmethod
     def _get_value(cls, node: ast.AST):
+        """
+        Extracts a string value from built-in AST node.
+        """
         for fieldname in cls._POSSIBLE_VALUE_FIELDS:
             value = getattr(node, fieldname, cls._MISSING)
             if value is not cls._MISSING and isinstance(value, cls._PRIMITIVE_TYPES):
