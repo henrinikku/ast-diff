@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def diff(source_ast: Node, target_ast: Node):
     """
-    Returns a diff of given ASTs.
+    Returns a diff of given ASTs using GumTreeMatcher and WithMoveEditScriptGenerator.
     """
     matcher = GumTreeMatcher()
     generator = WithMoveEditScriptGenerator()
