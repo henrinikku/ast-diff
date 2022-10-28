@@ -52,7 +52,9 @@ class Insert(Operation):
         self.node.parent = self.parent
 
     def standalone(self):
-        return replace(super().standalone(), parent=self.parent.standalone())
+        return replace(
+            super().standalone(), parent=self.parent and self.parent.standalone()
+        )
 
 
 @typic.al(strict=True)

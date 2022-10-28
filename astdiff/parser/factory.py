@@ -23,5 +23,3 @@ def build_parser(parser_type: ParserType, options: ParseOptions) -> Parser:
             return ParsoParser(options)
         case ParserType.BUILTIN_AST:
             return BuiltInASTParser(options)
-        case _:
-            raise ValueError()

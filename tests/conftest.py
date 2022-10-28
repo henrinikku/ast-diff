@@ -1,4 +1,5 @@
 import pytest
+from typer.testing import CliRunner
 
 from astdiff.ast.metadata import add_parents, attach_metadata
 from astdiff.ast.node import Node
@@ -9,6 +10,11 @@ from astdiff.matcher.gumtree import GumTreeMatcher
 from astdiff.parser.base import ParseOptions
 from astdiff.parser.builtin import BuiltInASTParser
 from astdiff.parser.parso import ParsoParser
+
+
+@pytest.fixture(scope="module")
+def cli_runner():
+    return CliRunner()
 
 
 @pytest.fixture(scope="function")

@@ -21,5 +21,3 @@ def build_edit_script_generator(
     match script_generator_type:
         case EditScriptGeneratorType.WITH_MOVE:
             return WithMoveEditScriptGenerator()
-        case _:
-            raise ValueError()

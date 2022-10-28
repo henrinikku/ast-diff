@@ -29,6 +29,7 @@ matplotlib = "^3.6.1"
 
 [tool.pytest.ini_options]
 addopts = "--benchmark-skip"
+filterwarnings = "ignore::DeprecationWarning"
 
 [tool.black]
 extend-exclude = "tests/data"

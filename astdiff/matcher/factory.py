@@ -25,5 +25,3 @@ def build_matcher(matcher_type: MatcherType) -> Matcher:
             return StubMatcher()
         case MatcherType.CHANGE_DISTILLER:
             return ChangeDistillingMatcher()
-        case _:
-            raise ValueError()
