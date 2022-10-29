@@ -62,6 +62,7 @@ class GumTreeMatcher(Matcher):
         """
         self.context = context
         self.matching_set = self.context.matching_set = MatchingSet()
+        self.dice_cache = {}
 
     def match_anchors(self, source_root: Node, target_root: Node):
         """
@@ -301,6 +302,10 @@ class GumTreeMatcher(Matcher):
             source_node = source_node.parent or source_node
             target_node = target_node.parent or target_node
 
+        cache_key = source_node.metadata.hashcode, target_node.metadata.hashcode
+        if cache_key in self.dice_cache:
+            return self.dice_cache[cache_key]
+
         source_descendants = set(id(x) for x in descendants(source_node))
         target_descendants = set(id(x) for x in descendants(target_node))
 
@@ -309,8 +314,10 @@ class GumTreeMatcher(Matcher):
             for x in source_descendants
         )
 
-        return (
+        self.dice_cache[cache_key] = (
             2
             * common_descendant_matches
             / (len(source_descendants) + len(target_descendants))
         )
+
+        return self.dice_cache[cache_key]
