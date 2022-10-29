@@ -178,7 +178,7 @@ class GumTreeMatcher(Matcher):
     def _attempt_recovery_matching(self, match: MatchingPair):
         """
         Implements recovery matching. That is, tries to find from the children of
-        given nodes new matches that have previously been missed previously.
+        the given nodes new matches that have been missed during previous phases.
         """
         logger.debug("Finding recovery matches...")
 
@@ -195,6 +195,7 @@ class GumTreeMatcher(Matcher):
         self._attempt_longest_common_subsequence_matching(
             source, target, lambda a, b: a.isomorphic_to(b)
         )
+
         self._attempt_longest_common_subsequence_matching(
             source, target, lambda a, b: a.isomorphic_to_without_values(b)
         )
@@ -231,7 +232,7 @@ class GumTreeMatcher(Matcher):
     def _attempt_histogram_matching(self, source: Node, target: Node):
         """
         Looks for unmatched but matchable subtrees by searching nodes that have
-        an unique label among their siblings.
+        an unique label (i.e. type) among their siblings.
         """
         group_by_label = partial(group_by, key_fn=lambda x: x.label)
 

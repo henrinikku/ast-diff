@@ -71,8 +71,8 @@ class Node:
     @property
     def compare_fields(self):
         """
-        Fields used for comparing nodes. The ordering of nodes is not important
-        but it must be stable.
+        Fields used for comparing nodes. The exact ordering of nodes is not important
+        but it must be stable / deterministic.
         """
         hashcode = (self.metadata and (self.metadata.hashcode,)) or ()
         return (self.label, self.value, len(self.children)) + hashcode
