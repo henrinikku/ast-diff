@@ -6,6 +6,7 @@ authors = ["Henri Nikku <henrinikku1@gmail.com>"]
 
 [tool.poetry.scripts]
 astdiff = "astdiff.main:app"
+plotruntime = "plot_runtime:plot"
 
 [tool.poetry.dependencies]
 python = "^3.10"

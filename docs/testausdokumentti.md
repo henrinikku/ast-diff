@@ -2,27 +2,25 @@
 
 [![codecov](https://codecov.io/gh/henrinikku/ast-diff/branch/main/graph/badge.svg?token=GAZWCV7WL8)](https://codecov.io/gh/henrinikku/ast-diff)
 
-### Miten testataan
+## Miten testataan
 
-Projektin testaus perustuu ainakin toistaiseksi kattaviin yksikkötesteihin. Lisäksi algoritmin eri vaiheiden suorituskykyä testataan mittaamalla niiden käyttämää aikaa suurilla syötteillä.
+Projektin automaattinen testaus perustuu kattaviin yksikkötesteihin. Kaikkiaan testejä on kolmenlaisia:
 
-Koska mahdollisia syntaksipuita on monenlaisia ja lopputulos riippuu paljon myös käytetystä parsintakirjastosta, useissa testeissä käytetäänsyötteenä GumTree-paperissa [1] havainnollistavana esimerkkinä käytettyä puuta. Lisäksi syötteinä käytetään myös itse kirjoittamiani sekä Githubista kaivettuja Python-tiedostoja.
+- Yksikkötestit
+- Integraatiotestit
+- Suorituskykytestit
 
-### Testien suorittaminen
+Suurin osa testeistä on toteutettu `pytest`-kirjaston avulla, ja pari yksittäistä testiä Pythonin oletus `unittest`-kirjaston avulla. Pytest-runner kykenee tunnistamaan ja ajamaan kaikki testit.
 
-Testit saa suoritettua ajamalla projektin juurikansiossa:
+## Yksikkötestit
 
-```
-poetry run pytest
-```
+Suurin osa projektin testeistä on yksikkötestejä, joita on kirjoitettu käytännössä kaikille luokille/metodeille erikseen pieniä poikkeuksia lukuunottamatta.
 
-### Suorituskykytestit
+## Integraatiotestit
 
-Suorituskykytestejä ei ajeta oletuksena, sillä niissä menee muita testejä huomattavasti enemmän aikaa. Suorituskykytestit saa suoritettua seuraavalla komennolla:
+Projektin integraatiotestit eivät teknisesti eroa yksikkötesteistä, mutta ne testaavat ohjelmaa kokonaisuutena. Integraatiotestit on toteutettu Typer-kirjaston [1] tarjoaman `CliRunner` luokan avulla, joka mahdollistaa ohjelman komentorivikäyttöliittymän kutsumisen testien sisältä.
 
-```
-poetry run pytest --benchmark-only
-```
+## Suorituskykytestit
 
 Suorituskykytestien ajamiseen menee tällä hetkellä noin minuutti ja ne tulostavat seuraavanlaisen raportin:
 
@@ -41,9 +39,31 @@ test_gumtree_performance_2k_lines                     21,684,961.6370 (>1000.0) 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
-Suoritusajat on ilmoitettu raportissa mikrosekunteina, eli esimerkiksi GumTree-matchaysalgoritmin suorittamiseen kuluu 2000 rivin Python-tiedostoilla noin 19 sekuntia, mikä vastaa suurinpiirtein odotuksiani.
+Suoritusajat on ilmoitettu raportissa mikrosekunteina, eli esimerkiksi GumTree-matchaysalgoritmin suorittamiseen kahdelle 2000 rivin Python-tiedostolle kuluu noin 19 sekuntia, mikä vastaa suurinpiirtein odotuksiani.
 
-### Testikattavuus
+## Testisyötteet
+
+Koska mahdollisia syntaksipuita on monenlaisia ja lopputulos riippuu paljon myös käytetystä parsintakirjastosta, useissa yksikkötesteissä käytetään syötteenä GumTree-paperissa [2] havainnollistavana esimerkkinä käytettyä, Java-kielen syntaksia kuvaavaa puuta. Lisäksi yksikkötesteissä käytetään syötteinä myös itse kirjoittamiani Python-koodinpätkiä. Itsetehdyt syötteet on täytynyt pitää melko pieninä, koska syntaksipuista tulee helposti melko suuria ja algoritmin toiminnan (ja siten odotetun lopputuloksen) järkeily on suhteellisen vaivalloista.
+
+Suorituskykytestauksen syötteinä käytetään joidenkin Django-projektin [3] tiedostojen eri versioita.
+
+Testeihin kovakoodattuja koodipätkiä lukuunottamatta kaikki testisyötteet löytyvät [tests/data](../tests/data/) -kansiosta.
+
+## Testien suorittaminen
+
+Yksikkö- ja integraatiotestit saa suoritettua ajamalla projektin juurikansiossa:
+
+```
+poetry run pytest
+```
+
+Suorituskykytestejä ei ajeta oletuksena, sillä niissä menee muita testejä huomattavasti enemmän aikaa. Suorituskykytestit saa suoritettua seuraavalla komennolla:
+
+```
+poetry run pytest --benchmark-only
+```
+
+## Testikattavuus
 
 Testikattavuusraportti päivittyy automaattisesti codecov-palveluun, ja codecov-badge löytyy tämän dokumentin sekä README:n ylälaidasta.
 
@@ -59,27 +79,63 @@ Vastaavasti kattavuusraportin saa tulostettua ajamalla:
 poetry run coverage report
 ```
 
-Yksikkötestien kattavuus on raportin perusteella tällä hetkellä melko hyvällä tolalla:
+Testikattavuus on raportin perusteella tällä hetkellä melko hyvällä tolalla:
 
 ```
-Name                          Stmts   Miss Branch BrPart  Cover   Missing
--------------------------------------------------------------------------
-astdiff/__init__.py               0      0      0      0   100%
-astdiff/ast.py                   26      0      4      0   100%
-astdiff/context.py               48      1     10      0    98%   62
-astdiff/differ.py                29      0      4      0   100%
-astdiff/edit_script.py           19      0     10      0   100%
-astdiff/gumtree.py              114      2     54      1    97%   71-72
-astdiff/matcher.py               15      3      6      0    86%   22, 36, 56
-astdiff/metadata.py              31      0     14      0   100%
-astdiff/parse.py                 42      0     14      0   100%
-astdiff/queue.py                 19      0      6      0   100%
-astdiff/script_generator.py      15      1      8      0    96%   15
-astdiff/traversal.py              9      0      4      0   100%
--------------------------------------------------------------------------
-TOTAL                           367      7    134      1    98%
+Name                               Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------
+astdiff/__init__.py                    0      0      0      0   100%
+astdiff/ast/metadata.py               35      0     18      0   100%
+astdiff/ast/node.py                   54      0     12      1    98%   58->exit
+astdiff/ast/traversal.py              20      0      6      0   100%
+astdiff/context.py                    75      3     24      2    95%   26, 103, 112
+astdiff/differ.py                     27      0      0      0   100%
+astdiff/editscript/__init__.py         5      0      2      0   100%
+astdiff/editscript/ops.py             48      1     14      0    98%   24
+astdiff/generator/__init__.py          0      0      0      0   100%
+astdiff/generator/base.py              9      1      0      0    89%   18
+astdiff/generator/factory.py           9      0      2      1    91%   22->exit
+astdiff/generator/with_move.py        79      5     36      3    93%   134-138, 154->160, 157->154
+astdiff/main.py                       25      1      2      1    93%   58
+astdiff/matcher/__init__.py            0      0      0      0   100%
+astdiff/matcher/base.py               14      1      0      0    93%   16
+astdiff/matcher/factory.py            15      0      6      1    95%   26->exit
+astdiff/matcher/gumtree.py           143      9     88      5    91%   126->exit, 131-142, 189-193, 226, 300-301
+astdiff/matcher/gumtree_utils.py      33      1     10      0    93%   22
+astdiff/parser/__init__.py             0      0      0      0   100%
+astdiff/parser/base.py                36      2      6      0    95%   70, 78
+astdiff/parser/builtin.py             23      0      6      0   100%
+astdiff/parser/factory.py             13      0      4      1    94%   24->exit
+astdiff/parser/parso.py               31      0     10      0   100%
+astdiff/util.py                       49      0     20      0   100%
+------------------------------------------------------------------------------
+TOTAL                                743     24    266     15    95%
 ```
 
-### Viitteet
+## Suorituskykytestauksen tuloksia
 
-- [1] https://hal.archives-ouvertes.fr/hal-01054552/document
+### Kopioimalla muodostetut syötteet
+
+Ohjelman eri vaiheiden suorituskykyä testatessa kävi ilmi, että algoritmin ns. anchor matching (eli ensimmäinen) vaihe muodostaa merkittävän pullonkaulan syötteillä, joissa sama pitkähkö koodinpätkä toistuu monta kertaa peräkkäin. Tämä käy järkeen, sillä löytäessään useita keskenään isomorfisia alipuita algoritmi joutuu laskemaan kahden puun samankaltaisuutta mittaavan dice-kertoimen jokaiselle näiden puiden karteesisesta tulosta muodostuvalle parille selvittääkseen parhaan mahdollisen matchin. Dice-kertoimen laskeminen taas on suhteellisen kallis operaatio näin monta kertaa suoritettavaksi.
+
+![runtime_no_dice_cache.png](img/runtime_no_dice_cache.png)
+
+Onneksi Dice-kertoimen laskennan tulosten talletus ja uudelleenkäyttö ([249bc3de](https://github.com/henrinikku/ast-diff/commit/249bc3dea0200290f5b043aeb7fedb72285e4781)) eliminoi pullonkaulan täysin. Muutoksen myötä algoritmi toimii kymmeniä kertoja nopeammin mainitun kaltaisilla syötteillä.
+
+![runtime_dice_cache.png](img/runtime_dice_cache.png)
+
+### Käsin valitut syötteet
+
+Anchor matching -vaihe vei odotetusten mukaisesti suurimman osan ajasta myös käsin valituilla Django-projektin [3] tiedostoilla testattaessa. Huom: alla syötteen koko merkitsee lähdetiedoston rivimäärän sijaan syntaksipuun solmujen lukumäärää.
+
+![django-no-cache](img/runtime_django_source_no_cache.png)
+
+Hieman yllättäen Dice-kertoimen cachetus paransi suorituskykyä jonkin verran myös tässä tapauksessa, vaikka tiedostoissa ei ole (ainakaan) tarkoituksella kovin paljoa toisteisuutta.
+
+![django-cache](img/runtime_django_source.png)
+
+## Viitteet
+
+- [1] https://github.com/tiangolo/typer
+- [2] https://hal.archives-ouvertes.fr/hal-01054552/document
+- [3] https://github.com/django/django
