@@ -74,7 +74,6 @@ def test_app_invalid_parser(cli_runner: CliRunner):
 
     assert result.exit_code == 2
     assert type(result.exception) is SystemExit
-    assert "Invalid value for '--parser-type'" in result.output
 
 
 def test_app_invalid_matcher(cli_runner: CliRunner):
@@ -82,7 +81,6 @@ def test_app_invalid_matcher(cli_runner: CliRunner):
 
     assert result.exit_code == 2
     assert type(result.exception) is SystemExit
-    assert "Invalid value for '--matcher-type'" in result.output
 
 
 def test_app_invalid_edit_script_generator(cli_runner: CliRunner):
@@ -92,7 +90,6 @@ def test_app_invalid_edit_script_generator(cli_runner: CliRunner):
 
     assert result.exit_code == 2
     assert type(result.exception) is SystemExit
-    assert "Invalid value for '--script-generator-type'" in result.output
 
 
 def test_app_empty_args(cli_runner: CliRunner):
@@ -100,11 +97,9 @@ def test_app_empty_args(cli_runner: CliRunner):
 
     assert result.exit_code == 2
     assert type(result.exception) is SystemExit
-    assert "Usage: diff [OPTIONS] SOURCE TARGET" in result.output
 
 
 def test_app_help(cli_runner: CliRunner):
     result = cli_runner.invoke(app, default_input + ("--help",))
 
     assert result.exit_code == 0
-    assert "Usage: diff [OPTIONS] SOURCE TARGET" in result.output
