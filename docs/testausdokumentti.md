@@ -104,13 +104,13 @@ astdiff/editscript/ops.py             48      1     14      0    98%   24
 astdiff/generator/__init__.py          0      0      0      0   100%
 astdiff/generator/base.py              9      1      0      0    89%   18
 astdiff/generator/factory.py           9      0      2      1    91%   22->exit
-astdiff/generator/with_move.py        79      5     36      3    93%   134-138, 154->160, 157->154
+astdiff/generator/with_move.py        79      0     36      2    98%   154->160, 157->154
 astdiff/main.py                       25      1      2      1    93%   58
 astdiff/matcher/__init__.py            0      0      0      0   100%
 astdiff/matcher/base.py               14      1      0      0    93%   16
 astdiff/matcher/factory.py            15      0      6      1    95%   26->exit
-astdiff/matcher/gumtree.py           143      9     88      5    91%   126->exit, 131-142, 189-193, 226, 300-301
-astdiff/matcher/gumtree_utils.py      33      1     10      0    93%   22
+astdiff/matcher/gumtree.py           148      3     90      2    98%   190-194, 228
+astdiff/matcher/gumtree_utils.py      33      0     10      0   100%
 astdiff/parser/__init__.py             0      0      0      0   100%
 astdiff/parser/base.py                36      2      6      0    95%   70, 78
 astdiff/parser/builtin.py             23      0      6      0   100%
@@ -118,7 +118,7 @@ astdiff/parser/factory.py             13      0      4      1    94%   24->exit
 astdiff/parser/parso.py               31      0     10      0   100%
 astdiff/util.py                       49      0     20      0   100%
 ------------------------------------------------------------------------------
-TOTAL                                743     24    266     15    95%
+TOTAL                                748     12    268     11    98%
 ```
 
 ## Suorituskykytestauksen tuloksia
