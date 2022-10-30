@@ -76,6 +76,28 @@ def test_diff_move_update_builtin_parser(builtin_parser: BuiltInASTParser):
     )
 
 
+def test_diff_empty_target(builtin_parser: BuiltInASTParser):
+    source_ast = builtin_parser.parse_code("print('123')")
+    target_ast = builtin_parser.parse_code("")
+
+    source_size = source_ast.metadata.size
+    target_size = target_ast.metadata.size
+
+    context = diff(source_ast, target_ast)
+
+    assert context.source_root == context.target_root
+
+    # Even empty AST has a root node
+    assert len(context.edit_script) == source_size - target_size
+    assert context.edit_script.standalone() == (
+        Delete(node=Node(label="Load", value="")),
+        Delete(node=Node(label="Name", value="print")),
+        Delete(node=Node(label="Constant", value="123")),
+        Delete(node=Node(label="Call", value="")),
+        Delete(node=Node(label="Expr", value="")),
+    )
+
+
 def test_diff_without_matching(
     builtin_parser: BuiltInASTParser,
     stub_matcher: Matcher,
