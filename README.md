@@ -5,7 +5,9 @@
 ## Dokumentaatio
 
 - [Määrittelydokumentti](docs/maarittelydokumentti.md)
+- [Toteutusdokumentti](docs/toteutusdokumentti.md)
 - [Testausdokumentti](docs/testausdokumentti.md)
+- [Käyttöohje](docs/kayttoohje.md)
 
 ## Viikkoraportit
 
