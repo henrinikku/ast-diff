@@ -2,6 +2,10 @@
 
 [![codecov](https://codecov.io/gh/henrinikku/ast-diff/branch/main/graph/badge.svg?token=GAZWCV7WL8)](https://codecov.io/gh/henrinikku/ast-diff)
 
+<!-- ## Releaset
+
+- [Loppupalautus]() -->
+
 ## Dokumentaatio
 
 - [Määrittelydokumentti](docs/maarittelydokumentti.md)
@@ -37,70 +41,3 @@
 ### Viikko 6
 
 - [Viikkoraportti 6](docs/viikko6.md)
-
-## Käyttöohjeet
-
-Kaikki komennot suoritetaan projektin juurikansiossa.
-
-### Vaatimukset
-
-- Python 3.10.6
-- poetry
-
-### Asennus
-
-Asenna riippuvuudet:
-
-```
-poetry install
-```
-
-Asenna git hookit:
-
-```
-poetry run pre-commit install --install-hooks
-```
-
-### Suoritus
-
-```
-poetry run astdiff <source> <target>
-```
-
-Missä `source` ja `target` ovat joko polkuja Python-tiedostoihin tai Python-koodinpätkiä.
-
-### Testien suoritus
-
-```
-poetry run pytest
-```
-
-### Testikattavuuden mittaus
-
-```
-poetry run coverage run
-```
-
-### Testikattavuuden raportointi
-
-```
-poetry run coverage report
-```
-
-### Formatointi
-
-```
-poetry run black .
-```
-
-### Importien sorttaus
-
-```
-poetry run isort .
-```
-
-### Linttaus
-
-```
-poetry run flake8
-```
