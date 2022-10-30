@@ -98,6 +98,28 @@ def test_diff_empty_target(builtin_parser: BuiltInASTParser):
     )
 
 
+def test_diff_duplicate_code(builtin_parser: BuiltInASTParser):
+    source_ast = builtin_parser.parse_code(
+        "print('foo');print('123');print('123');print('123')"
+    )
+    target_ast = builtin_parser.parse_code(
+        "print('foo');print('123');print('foo');print('foo')"
+    )
+
+    context = diff(source_ast, target_ast)
+
+    assert context.source_root == context.target_root
+    assert context.edit_script.standalone() == (
+        Move(
+            node=Node(label="Expr", value=""),
+            parent=Node(label="Module", value=""),
+            position=2,
+        ),
+        Update(node=Node(label="Constant", value="123"), value="foo"),
+        Update(node=Node(label="Constant", value="123"), value="foo"),
+    )
+
+
 def test_diff_without_matching(
     builtin_parser: BuiltInASTParser,
     stub_matcher: Matcher,
