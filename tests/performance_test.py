@@ -31,6 +31,16 @@ def python_target_2k_lines(parser: Parser):
     return parser.parse_file("tests/data/2k_lines_target.py")
 
 
+@pytest.fixture(scope="function")
+def django_5k_lines(parser: Parser):
+    return parser.parse_file("tests/data/django_5k_lines.py")
+
+
+@pytest.fixture(scope="function")
+def django_8k_lines(parser: Parser):
+    return parser.parse_file("tests/data/django_8k_lines.py")
+
+
 def test_metadata_calculation_performance_200_lines(
     benchmark, no_metadata_parser: Parser
 ):
@@ -129,6 +139,25 @@ def test_diff_performance_2k_lines(
 ):
     def setup():
         context = DiffContext(python_source_2k_lines, python_target_2k_lines)
+        return [context], {}
+
+    def diff(context: DiffContext):
+        context.matching_set = matcher.find_matching_nodes(context)
+        context.edit_script = generator.generate_edit_script(context)
+        return context
+
+    benchmark.pedantic(diff, rounds=3, setup=setup)
+
+
+def test_diff_performance_django_code_8k_lines(
+    benchmark: BenchmarkFixture,
+    matcher: GumTreeMatcher,
+    generator: WithMoveEditScriptGenerator,
+    django_5k_lines: Node,
+    django_8k_lines: Node,
+):
+    def setup():
+        context = DiffContext(django_5k_lines, django_8k_lines)
         return [context], {}
 
     def diff(context: DiffContext):
