@@ -36,7 +36,7 @@ Solmujen matchayksen toteuttavat luokat perivät [`Matcher`](../astdiff/matcher/
 2. [`stub`](../astdiff/matcher/base.py) (ei matchaa mitään nodeja)
 3. [`change-distiller`](../astdiff/matcher/base.py) (ei toteutettu ja heittää virheen, jätin esimerkiksi siitä miten ohjelmaa voisi helposti laajentaa)
 
-`GumTreeMatcher`-luokan toteuttaman algoritmin aikavaativuus on luokkaa O(n^2). Kuten GumTree-paperin [3] kohdassa 3.3 sanotaan, algoritmi käy pahimmassa tapauksessa läpi useamman solmun karteesisen tulon pariin kertaan, ja karteesisen tulon "sisällä" suoritettavien kalliimpien operaatioiden suorituksen vaativuutta on rajoitettu vakiomuuttujilla ja tulosten uudelleenkäytöllä.
+[`GumTreeMatcher`](../astdiff/matcher/gumtree.py)-luokan toteuttaman algoritmin aikavaativuus on luokkaa O(n^2). Kuten GumTree-paperin [3] kohdassa 3.3 sanotaan, algoritmi käy pahimmassa tapauksessa läpi useamman solmun karteesisen tulon pariin kertaan, ja karteesisen tulon "sisällä" suoritettavien kalliimpien operaatioiden suorituksen vaativuutta on rajoitettu vakiomuuttujilla ja tulosten uudelleenkäytöllä.
 
 ### Edit scriptin generointi
 
