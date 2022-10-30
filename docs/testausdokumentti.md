@@ -42,7 +42,7 @@ test_diff_performance_django_code_8k_lines            25,932,371.1940 (>1000.0) 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
-Suoritusajat on ilmoitettu raportissa mikrosekunteina, eli esimerkiksi 5000 ja 8000 rivin tiedostojen vertailuun kuluu omalla MacBookillani aikaa noin 27.8 sekuntia.
+Suoritusajat on ilmoitettu raportissa mikrosekunteina, eli esimerkiksi 5000 ja 8000 rivin tiedostojen vertailuun kuluu omalla MacBookillani aikaa noin 27 sekuntia.
 
 Algoritmin eri vaiheiden erikokoisilla syötteillä vaatimaa aikaa esittävän kuvaajan saa luotua ajamalla projektin juurikansiossa esim.
 
