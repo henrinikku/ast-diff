@@ -35,7 +35,9 @@ Kuvauksen asetuksista saa tulostettua ajamalla:
 
 ```
 poetry run astdiff --help
+```
 
+```
 Usage: astdiff [OPTIONS] SOURCE TARGET
 
  Prints an edit script which describes differences between syntax trees produced by source and target.
