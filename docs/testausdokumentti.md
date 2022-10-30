@@ -139,7 +139,7 @@ Anchor matching -vaihe vei odotetusten mukaisesti suurimman osan ajasta myös k�
 
 ![django-no-cache](img/runtime_django_source_no_cache.png)
 
-Hieman yllättäen Dice-kertoimen cachetus paransi suorituskykyä jonkin verran myös tässä tapauksessa, vaikka tiedostoissa ei ole (ainakaan) tarkoituksella kovin paljoa toisteisuutta.
+Hieman yllättäen Dice-kertoimen cachetus paransi suorituskykyä jonkin verran myös tässä tapauksessa, vaikka tiedostoissa ei ole (ainakaan tarkoituksella) kovin paljoa toisteisuutta.
 
 ![django-cache](img/runtime_django_source.png)
 
