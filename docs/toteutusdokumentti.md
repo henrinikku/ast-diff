@@ -24,7 +24,7 @@ Näistä vaiheista kaksi viimeistä toteuttavat itse erottelualgoritmin. Vaiheid
 
 ### Syötteen parsiminen ja syntaksipuun muodostus
 
-Syötteen parsimisen toteuttavat luokat perivät [`Parser`](../astdiff/parser/base.py)-luokan ja toteuttavat metodit syötteen parsimiseksi haluttuun muotoon (ks. [`Node`](../astdiff/ast/node.py)-luokka) jonkin ulkopuolisen kirjaston avulla. Tällä hetkellä käyttäjän on mahdollista valita parso-kirjaston ja Pythonin oletus AST-kirjaston väliltä.
+Syötteen parsimisen toteuttavat luokat perivät [`Parser`](../astdiff/parser/base.py)-luokan ja toteuttavat metodit syötteen parsimiseksi haluttuun muotoon (ks. [`Node`](../astdiff/ast/node.py)-luokka) jonkin ulkopuolisen kirjaston avulla. Tällä hetkellä käyttäjän on mahdollista valita parso-kirjaston [4] ja Pythonin oletus AST-kirjaston [5] väliltä.
 
 Tämä vaihe on ohjelman toimivuuden kannalta pakollinen, mutta en toteuttanut parsimista itse (eikä se ollut alunperinkään tarkoitus), joten en huomioi parsimisen aikavaativuutta ohjelman aikavaativuusanalyysissa. Suorituskykytestauksen yhteydessä kävi kuitenkin ilmi, että parsimiseen kuluu merkittävä osuus ohjelman kokonaissuoritusajasta. Syötteistä riippuen parsinta vie tyypillisesti joko eniten tai toisiksi eniten suoritusaikaa.
 
@@ -59,4 +59,5 @@ Ohjelmaan voisi myös lisätä useita toteutuksia eri vaiheille, jolloin eri alg
 - [1] https://dl.acm.org/doi/pdf/10.1145/235968.233366
 - [2] http://serg.aau.at/pub/MartinPinzger/Publications/Fluri2007-changedistiller.pdf
 - [3] https://hal.archives-ouvertes.fr/hal-01054552/document
-- [4] https://docs.python.org/3/library/ast.html
+- [4] https://github.com/davidhalter/parso
+- [5] https://docs.python.org/3/library/ast.html
