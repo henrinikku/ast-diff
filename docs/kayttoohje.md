@@ -9,8 +9,6 @@ Kaikki komennot suoritetaan projektin juurikansiossa.
 - Python 3.10.6
 - poetry
 
-## Käyttö
-
 ## Asennus
 
 Jos haluat ainoastaan suorittaa ohjelman eikä ole tarvetta ajaa testejä tms, voit skipata dev-riippuvuudet lisäämällä komentoon `--no-dev`:

@@ -2,16 +2,34 @@
 
 [![codecov](https://codecov.io/gh/henrinikku/ast-diff/branch/main/graph/badge.svg?token=GAZWCV7WL8)](https://codecov.io/gh/henrinikku/ast-diff)
 
-<!-- ## Releaset
-
-- [Loppupalautus]() -->
-
 ## Dokumentaatio
 
 - [Määrittelydokumentti](docs/maarittelydokumentti.md)
 - [Toteutusdokumentti](docs/toteutusdokumentti.md)
 - [Testausdokumentti](docs/testausdokumentti.md)
 - [Käyttöohje](docs/kayttoohje.md)
+
+## Releaset
+
+- [Loppupalautus](https://github.com/henrinikku/ast-diff/releases/tag/v0.1.0)
+
+Käyttöohje on tehty oletuksella, että käyttäjän kloonaa projektin. Projektin voi asentaa suoraan releasesta ajamalla esim:
+
+```
+python3 -m pip install https://github.com/henrinikku/ast-diff/releases/download/v0.1.0/astdiff-0.1.0-py3-none-any.whl
+```
+
+tai vanhemmilla pip-versioilla
+
+```
+python3 -m pip install --use-wheel https://github.com/henrinikku/ast-diff/releases/download/v0.1.0/astdiff-0.1.0-py3-none-any.whl
+```
+
+Asennuksen jälkeen käyttö ilman poetrya onnistuu kuten poetryn kanssakin, esim:
+
+```
+python3 -m astdiff "print('foo')" "print('bar')"
+```
 
 ## Viikkoraportit
 
