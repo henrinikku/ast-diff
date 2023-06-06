@@ -1,6 +1,6 @@
 # ast-diff
 
-Diff Python files using the [Gumtree](https://hal.science/hal-01054552/PDF/main.pdf) algoritm.
+Diff Python files using the [Gumtree](https://hal.science/hal-01054552/PDF/main.pdf) algorithm.
 
 ## Usage
 Takes two parameters, source and target. Each parameter can be either python code or a path to a python file.
